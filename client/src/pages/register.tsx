@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './auth.css';
+import '../assets/styles/auth.css';
 
 export default function Register() {
   const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });

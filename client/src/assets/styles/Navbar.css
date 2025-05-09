@@ -1,0 +1,53 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4760c0;
+    padding: 10px 20px;
+    color: white;
+  }
+  
+  .navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .logo {
+    height: 40px; 
+    width: auto;
+  }
+  
+  .navbar-left span,
+  .navbar-right .usuario {
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+  }
+  
+  .navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .icon {
+    color: #2feef4;
+    font-size: 28px;
+  }
+  
+  .logout-btn {
+  margin-left: 10px;
+  background-color: transparent;
+  border: 1px solid #fff;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
