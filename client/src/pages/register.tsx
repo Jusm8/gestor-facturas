@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import '../assets/styles/auth.css';
+import '../assets/styles/login.css';
 
 export default function Register() {
   const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });
@@ -33,7 +33,8 @@ export default function Register() {
 
       if (response.ok) {
         alert('Registro exitoso');
-        navigate('/login'); // Redirigir al login
+        //Redirigir al login
+        navigate('/login'); 
       } else {
         alert(data?.error || 'Error al registrar');
       }
@@ -44,8 +45,8 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
+    <div className="login-container">
+      <div className="login-card">
         <h2>CREA TU CUENTA</h2>
         <form onSubmit={handleSubmit}>
           <label>Usuario:</label>

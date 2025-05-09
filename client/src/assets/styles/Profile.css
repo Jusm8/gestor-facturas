@@ -37,3 +37,11 @@
     cursor: pointer;
   }
   
+  .logout-btn{
+    background-color: #c02b2b;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }

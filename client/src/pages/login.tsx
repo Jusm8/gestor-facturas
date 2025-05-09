@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import '../assets/styles/auth.css';
+import '../assets/styles/login.css';
 
 export default function Login() {
     const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });
@@ -37,8 +37,8 @@ export default function Login() {
     };
 
     return (
-        <div className="auth-container">
-            <div className="auth-card">
+        <div className="login-container">
+            <div className="login-card">
                 <h2>LOGIN TO YOUR ACCOUNT</h2>
                 <form onSubmit={handleSubmit}>
                     <label>Usuario:</label>
