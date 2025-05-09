@@ -4,13 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-  const { user } = useAuth();
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
+
   const [form, setForm] = useState({
     nombre: user?.nombre || '',
     email: user?.email || '',
+    rol: user?.rol || '',
+    puesto: user?.puesto || '',
+    departamento: user?.departamento || '',
+    organizacion: user?.organizacion || '',
+    ubicacion: user?.ubicacion || '',
+    hora: user?.hora || '',
     imagen: user?.imagen_url || ''
   });
 
@@ -30,59 +36,62 @@ export default function Profile() {
     e.preventDefault();
     setEditMode(false);
     console.log('Datos guardados:', form);
-    // Petición al backend
+    // Aquí irá la petición al backend
   };
 
-  //Logout
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    // limpio el contexto
-    setUser(null); 
+    setUser(null);
     navigate('/login');
   };
 
   return (
-    <div className="profile-container">
-      <h2>Mi Perfil</h2>
-      <div className="profile-card">
-        <div className="profile-image">
+    <div className="profile-wrapper">
+      <div className="left-panel">
+        <h3>Espacio para futuras funcionalidades</h3>
+      </div>
+
+      <form className="profile-card" onSubmit={handleSubmit}>
+        <div className="profile-img">
           <img src={form.imagen || '/default-profile.png'} alt="Perfil" />
           {editMode && <input type="file" onChange={handleImageUpload} />}
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <div className="profile-info">
+          {/* Campos de usuario */}
           <label>Nombre:</label>
-          <input
-            type="text"
-            name="nombre"
-            value={form.nombre}
-            onChange={handleChange}
-            disabled={!editMode}
-          />
+          <input name="nombre" value={form.nombre} onChange={handleChange} disabled={!editMode} />
 
           <label>Email:</label>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            disabled={!editMode}
-          />
+          <input name="email" value={form.email} onChange={handleChange} disabled={!editMode} />
 
           <label>Rol:</label>
-          <input type="text" value={user?.rol} disabled />
+          <input value={form.rol} disabled />
 
-          {editMode ? (
-            <button type="submit">Guardar</button>
-          ) : (
-            <button type="button" onClick={() => setEditMode(true)}>
-              Editar
-            </button>
-          )}
-        </form>
+          <label>Puesto de trabajo:</label>
+          <input name="puesto" value={form.puesto} onChange={handleChange} disabled={!editMode} />
+
+          <label>Departamento:</label>
+          <input name="departamento" value={form.departamento} onChange={handleChange} disabled={!editMode} />
+
+          <label>Organización:</label>
+          <input name="organizacion" value={form.organizacion} onChange={handleChange} disabled={!editMode} />
+
+          <label>Ubicación:</label>
+          <input name="ubicacion" value={form.ubicacion} onChange={handleChange} disabled={!editMode} />
+
+          <label>Hora local:</label>
+          <input name="hora" value={form.hora} onChange={handleChange} disabled={!editMode} />
+        </div>
+      </form>
+
+      <div className="right-panel">
+        <button className='edit-btn' type={editMode ? 'submit' : 'button'} onClick={() => setEditMode(!editMode)}>
+          {editMode ? 'Guardar' : 'Editar'}
+        </button>
+        <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>
-      <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
     </div>
   );
 }

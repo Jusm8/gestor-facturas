@@ -1,47 +1,76 @@
-.profile-container {
-    padding: 2rem;
-    text-align: center;
-  }
-  
-  .profile-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    display: inline-block;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .profile-image img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-  }
-  
-  form input {
-    display: block;
-    width: 100%;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
-  }
-  
-  button {
-    background-color: #4760c0;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .logout-btn{
-    background-color: #c02b2b;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+.profile-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(to right, #4760c0, #17224d);
+  padding: 3rem;
+  min-height: 100vh;
+  gap: 2rem;
+}
+
+.left-panel {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px dashed #ccc;
+  color: white;
+  flex: 1;
+  padding: 1.5rem;
+  height: 500px;
+  text-align: center;
+  border-radius: 8px;
+}
+
+.profile-card {
+  color: white;
+  background: #2f4187;
+  padding: 2rem;
+  border-radius: 10px;
+  flex: 2;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.profile-img img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.profile-info label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.profile-info input {
+  width: 100%;
+  padding: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.right-panel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1rem;
+  padding-left: 1rem;
+}
+
+.right-panel button {
+  background-color: #4760c0;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-btn {
+  background-color: #c02b2b;
+}
+
+.edit-btn {
+  margin-left: 0.6rem;
+
+}

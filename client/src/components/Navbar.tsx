@@ -29,7 +29,7 @@ export default function Navbar() {
       </div>
       <div className="navbar-right">
         <span className="usuario" onClick={() => navigate('/perfil')}>Usuario</span>
-        <FaUserCircle />
+        <FaUserCircle size={38}/>
         <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>
 
