@@ -2,22 +2,35 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 
+//Registro de usuario
 exports.register = async (req, res) => {
   const { nombre, email, password, rol } = req.body;
 
   try {
+    //Verificar si ya se usa el email
+    const [existing] = await pool.query('SELECT idUsuario FROM Usuario WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.status(409).json({ error: 'El email ya está registrado.' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    //Insertar nuevo usuario
     await pool.query(
       'INSERT INTO Usuario (nombre, email, password, rol) VALUES (?, ?, ?, ?)',
       [nombre, email, hashedPassword, rol]
     );
+    //Confirmar que se registro el usuario
     res.status(201).json({ message: 'Usuario registrado correctamente' });
   } catch (error) {
+    //Error en el registro
     console.error('Error en el registro:', error);
     res.status(500).json({ error: 'Error en el registro' });
   }
 };
 
+
+//Login de usuario
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -34,5 +47,37 @@ exports.login = async (req, res) => {
     res.json({ token, user: { id: user.idUsuario, nombre: user.nombre, rol: user.rol } });
   } catch (error) {
     res.status(500).json({ error: 'Error en el login' });
+  }
+};
+
+//Actualizar perfil
+exports.updateProfile = async (req, res) => {
+  const {
+    idUsuario,
+    nombre,
+    email,
+    imagen_url,
+    fecha_nacimiento,
+    sexo,
+    localidad
+  } = req.body;
+
+  try {
+    const [result] = await pool.query(
+      `UPDATE Usuario SET
+        nombre = ?, 
+        email = ?, 
+        imagen_url = ?, 
+        fecha_nacimiento = ?, 
+        sexo = ?, 
+        localidad = ?
+      WHERE idUsuario = ?`,
+      [nombre, email, imagen_url, fecha_nacimiento, sexo, localidad, idUsuario]
+    );
+
+    res.json({ message: 'Perfil actualizado correctamente' });
+  } catch (error) {
+    console.error('Error actualizando perfil:', error);
+    res.status(500).json({ error: 'Error actualizando el perfil' });
   }
 };

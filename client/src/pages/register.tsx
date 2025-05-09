@@ -29,12 +29,17 @@ export default function Register() {
         }),
       });
 
+      if (response.status === 409) {
+        alert('Este email ya está registrado. Prueba con otro.');
+        return;
+      }
+
       const data = await response.json();
 
       if (response.ok) {
         alert('Registro exitoso');
         //Redirigir al login
-        navigate('/login'); 
+        navigate('/login');
       } else {
         alert(data?.error || 'Error al registrar');
       }
