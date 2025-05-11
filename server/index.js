@@ -12,6 +12,9 @@ app.use(express.json());
 
 app.use('/api/auth', require('./routes/auth.routes'));
 
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
+
 app.listen(process.env.PORT, () => {
   console.log(`Servidor backend en http://localhost:${process.env.PORT}`);
 });

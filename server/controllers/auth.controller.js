@@ -44,7 +44,20 @@ exports.login = async (req, res) => {
     if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
     const token = jwt.sign({ id: user.idUsuario, rol: user.rol }, process.env.JWT_SECRET);
-    res.json({ token, user: { id: user.idUsuario, nombre: user.nombre, rol: user.rol } });
+    res.json({
+      token,
+      user: {
+        id: user.idUsuario,
+        nombre: user.nombre,
+        email: user.email,
+        rol: user.rol,
+        imagen_url: user.imagen_url,
+        fecha_nacimiento: user.fecha_nacimiento,
+        sexo: user.sexo,
+        localidad: user.localidad
+      }
+    });
+
   } catch (error) {
     res.status(500).json({ error: 'Error en el login' });
   }
@@ -63,21 +76,71 @@ exports.updateProfile = async (req, res) => {
   } = req.body;
 
   try {
+    const clean = (value) => value === '' ? null : value;
+
     const [result] = await pool.query(
       `UPDATE Usuario SET
-        nombre = ?, 
-        email = ?, 
-        imagen_url = ?, 
-        fecha_nacimiento = ?, 
-        sexo = ?, 
-        localidad = ?
-      WHERE idUsuario = ?`,
-      [nombre, email, imagen_url, fecha_nacimiento, sexo, localidad, idUsuario]
+    nombre = ?, 
+    email = ?, 
+    imagen_url = ?, 
+    fecha_nacimiento = ?, 
+    sexo = ?, 
+    localidad = ?
+  WHERE idUsuario = ?`,
+      [
+        clean(nombre),
+        clean(email),
+        clean(imagen_url),
+        clean(fecha_nacimiento),
+        clean(sexo),
+        clean(localidad),
+        idUsuario
+      ]
     );
 
     res.json({ message: 'Perfil actualizado correctamente' });
   } catch (error) {
     console.error('Error actualizando perfil:', error);
     res.status(500).json({ error: 'Error actualizando el perfil' });
+  }
+};
+
+exports.crearProyecto = async (req, res) => {
+  const {
+    nombre,
+    descripcion,
+    fecha_inicio,
+    fecha_fin,
+    estado,
+    Usuario_idUsuario
+  } = req.body;
+
+  try {
+    await pool.query(
+      `INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_fin, estado, Usuario_idUsuario)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [nombre, descripcion, fecha_inicio, fecha_fin, estado, Usuario_idUsuario]
+    );
+
+    res.status(201).json({ message: 'Proyecto creado correctamente' });
+  } catch (error) {
+    console.error('Error al crear proyecto:', error);
+    res.status(500).json({ error: 'Error al crear el proyecto' });
+  }
+};
+
+exports.obtenerProyectosPorUsuario = async (req, res) => {
+  const { idUsuario } = req.params;
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT * FROM Proyecto WHERE Usuario_idUsuario = ?',
+      [idUsuario]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al obtener proyectos:', error);
+    res.status(500).json({ error: 'Error al obtener los proyectos' });
   }
 };

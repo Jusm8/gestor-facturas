@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../assets/styles/Profile.css';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function Profile() {
   const { user, setUser } = useAuth();
@@ -12,16 +13,25 @@ export default function Profile() {
     nombre: user?.nombre || '',
     email: user?.email || '',
     rol: user?.rol || '',
-    puesto: user?.puesto || '',
-    departamento: user?.departamento || '',
-    organizacion: user?.organizacion || '',
-    ubicacion: user?.ubicacion || '',
-    hora: user?.hora || '',
-    imagen: user?.imagen_url || '',
+    imagen_url: user?.imagen_url || '',
     fecha_nacimiento: user?.fecha_nacimiento || '',
     sexo: user?.sexo || '',
     localidad: user?.localidad || ''
   });
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        nombre: user.nombre || '',
+        email: user.email || '',
+        rol: user.rol || '',
+        imagen_url: user.imagen_url || '',
+        fecha_nacimiento: user.fecha_nacimiento || '',
+        sexo: user.sexo || '',
+        localidad: user.localidad || ''
+      });
+    }
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -32,19 +42,28 @@ export default function Profile() {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
-      setForm({ ...form, imagen: url });
+      setForm({ ...form, imagen_url: url });
     }
   };
 
   //Guardar cambios de los datos del perfil
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setEditMode(false);
+    const token = localStorage.getItem('token');
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+
+    // Verifica si los datos han cambiado
+    const hasChanged = Object.keys(form).some(
+      key => form[key as keyof typeof form] !== userData[key]
+    );
+
+    if (!hasChanged) {
+      alert('No hay cambios para guardar');
+      setEditMode(false);
+      return;
+    }
 
     try {
-      const token = localStorage.getItem('token');
-      const userData = JSON.parse(localStorage.getItem('user') || '{}');
-
       const response = await fetch('http://localhost:3001/api/auth/update', {
         method: 'PUT',
         headers: {
@@ -70,7 +89,10 @@ export default function Profile() {
       console.error(error);
       alert('Error de conexión');
     }
+
+    setEditMode(false);
   };
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -84,10 +106,13 @@ export default function Profile() {
       <div className="left-panel">
         <h3>Espacio para futuras funcionalidades</h3>
       </div>
-
-      <form className="profile-card" onSubmit={handleSubmit}>
+      <form id="profile-form" className="profile-card" onSubmit={handleSubmit}>
         <div className="profile-img">
-          <img src={form.imagen || '/default-profile.png'} alt="Perfil" />
+          {form.imagen_url ? (
+            <img src={form.imagen_url} alt="Perfil" />
+          ) : (
+            <div className="placeholder-img">Sin imagen</div>
+          )}
           {editMode && <input type="file" onChange={handleImageUpload} />}
         </div>
 
@@ -130,24 +155,26 @@ export default function Profile() {
 
           <label>Localidad:</label>
           <input
-            name="Localidad"
+            name="localidad"
             value={form.localidad}
             onChange={handleChange}
             disabled={!editMode}
           />
         </div>
       </form>
-
       <div className="right-panel">
         <button
           className="edit-btn"
-          type={editMode ? 'submit' : 'button'}
-          onClick={() => setEditMode(!editMode)}
+          type="button"
+          onClick={() => {
+            if (editMode) {
+              document.getElementById('profile-form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+            } else {
+              setEditMode(true);
+            }
+          }}
         >
           {editMode ? 'Guardar' : 'Editar'}
-        </button>
-        <button className="logout-btn" onClick={handleLogout}>
-          Cerrar sesión
         </button>
       </div>
     </div>

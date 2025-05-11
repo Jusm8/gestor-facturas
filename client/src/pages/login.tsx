@@ -2,8 +2,11 @@ import React from 'react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../assets/styles/login.css';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
+    const { setUser } = useAuth();
+
     const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });
 
     const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,8 +28,9 @@ export default function Login() {
             if (response.ok) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
+                setUser(data.user);
                 alert('Login exitoso');
-                window.location.href = '/dashboard'; // redirige a una página protegida
+                window.location.href = '/dashboard';
             } else {
                 alert(data.error || 'Error en el login');
             }

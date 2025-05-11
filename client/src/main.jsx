@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Proyectos from './pages/Proyectos';
+import NuevoProyecto from './pages/NuevoProyecto';
 
 const rootElement = document.getElementById('root');
 
@@ -21,22 +23,11 @@ if (rootElement) {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/perfil"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /></ProtectedRoute>} />
+            <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
+            <Route path="/perfil" element={ <ProtectedRoute> <Profile /> </ProtectedRoute> } />
+            <Route path="/proyectos" element={ <ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
+            <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
