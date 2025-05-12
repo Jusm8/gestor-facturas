@@ -26,6 +26,16 @@ export default function Proyectos() {
     fetchProyectos();
   }, []);
 
+  //Funcion para que salga siempre en formato dd/mm/yyyy
+  const formatFecha = (isoDate: string) => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+
   return (
     <div className="proyectos-container">
       <div className="proyectos-header">
@@ -46,8 +56,8 @@ export default function Proyectos() {
               <h3>{proy.nombre}</h3>
               <p className="estado">{proy.estado}</p>
               <p className="descripcion">{proy.descripcion || 'Sin descripción'}</p>
-              <p><strong>Inicio:</strong> {proy.fecha_inicio}</p>
-              <p><strong>Fin:</strong> {proy.fecha_fin || 'No definido'}</p>
+              <p><strong>Inicio:</strong> {formatFecha(proy.fecha_inicio)}</p>
+              <p><strong>Fin:</strong> {proy.fecha_fin ? formatFecha(proy.fecha_fin) : 'No definido'}</p>
             </div>
           ))}
         </div>

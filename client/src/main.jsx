@@ -10,6 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Proyectos from './pages/Proyectos';
 import NuevoProyecto from './pages/NuevoProyecto';
+import ProyectoDetalle from './pages/ProyectoDetalle';
 
 const rootElement = document.getElementById('root');
 
@@ -28,6 +29,7 @@ if (rootElement) {
             <Route path="/perfil" element={ <ProtectedRoute> <Profile /> </ProtectedRoute> } />
             <Route path="/proyectos" element={ <ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
+            <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

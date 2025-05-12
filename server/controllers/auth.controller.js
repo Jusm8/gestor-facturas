@@ -144,3 +144,37 @@ exports.obtenerProyectosPorUsuario = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener los proyectos' });
   }
 };
+
+exports.getPresupuestosByProyecto = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT p.idPresupuesto, p.fecha, p.estado, c.nombre as cliente, pd.descripcion
+      FROM Presupuesto p
+      JOIN Cliente c ON p.Cliente_idCliente = c.idCliente
+      LEFT JOIN PresupuestoDetalle pd ON pd.Presupuesto_idPresupuesto = p.idPresupuesto
+      WHERE p.Proyecto_idProyecto = ?
+    `, [req.params.id]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al obtener presupuestos:', error);
+    res.status(500).json({ error: 'Error al obtener presupuestos' });
+  }
+};
+
+exports.getFacturasByProyecto = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT f.idFactura, f.fecha, f.estado, c.nombre as cliente, fd.precio_unitario as descripcion
+      FROM Factura f
+      JOIN Cliente c ON f.Cliente_idCliente = c.idCliente
+      LEFT JOIN FacturaDetalle fd ON fd.Factura_idFactura = f.idFactura
+      WHERE f.Proyecto_idProyecto = ?
+    `, [req.params.id]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error al obtener facturas:', error);
+    res.status(500).json({ error: 'Error al obtener facturas' });
+  }
+};

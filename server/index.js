@@ -1,8 +1,6 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-console.log("Puerto cargado desde .env:", process.env.PORT); // Debug
-
 const express = require('express');
 const cors = require('cors');
 
