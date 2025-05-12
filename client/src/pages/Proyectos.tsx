@@ -3,7 +3,9 @@ import '../assets/styles/Proyectos.css';
 import { useNavigate } from 'react-router-dom';
 
 export default function Proyectos() {
+  const [proyectosOriginales, setProyectosOriginales] = useState<any[]>([]);
   const [proyectos, setProyectos] = useState<any[]>([]);
+  const [busqueda, setBusqueda] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,48 +18,61 @@ export default function Proyectos() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (res.ok) setProyectos(data);
-        else console.error(data.error);
+
+        if (res.ok) {
+          setProyectosOriginales(data);
+          setProyectos(data);
+        } else {
+          console.error(data.error);
+        }
       } catch (err) {
         console.error('Error cargando proyectos:', err);
       }
     };
 
     fetchProyectos();
+
   }, []);
 
-  //Funcion para que salga siempre en formato dd/mm/yyyy
-  const formatFecha = (isoDate: string) => {
-    const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-
+  useEffect(() => {
+    if (busqueda.trim() === '') {
+      setProyectos(proyectosOriginales);
+    } else {
+      const filtrados = proyectosOriginales.filter(p =>
+        p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      );
+      setProyectos(filtrados);
+    }
+  }, [busqueda, proyectosOriginales]);
 
   return (
     <div className="proyectos-container">
       <div className="proyectos-header">
-        <h2>Mis Proyectos</h2>
-        <button className="nuevo-btn" onClick={() => navigate('/proyectos/nuevo')}>
-          + Nuevo Proyecto
-        </button>
+        <input
+          type="text"
+          placeholder="Buscar proyecto por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="proyecto-buscador"
+        />
+        <button onClick={() => navigate('/proyectos/nuevo')}>+ Nuevo Proyecto</button>
       </div>
 
       {proyectos.length === 0 ? (
-        <div className="no-proyectos">
-          <p>No tienes ningún proyecto creado.</p>
-        </div>
+        <p className="no-proyectos">No hay proyectos que coincidan con la búsqueda.</p>
       ) : (
-        <div className="proyectos-grid">
+        <div className="proyecto-lista">
           {proyectos.map((proy) => (
-            <div className="proyecto-card" key={proy.idProyecto}>
+            <div
+              className="proyecto-card"
+              key={proy.idProyecto}
+              onClick={() => navigate(`/proyectos/${proy.idProyecto}`)}
+            >
               <h3>{proy.nombre}</h3>
-              <p className="estado">{proy.estado}</p>
-              <p className="descripcion">{proy.descripcion || 'Sin descripción'}</p>
-              <p><strong>Inicio:</strong> {formatFecha(proy.fecha_inicio)}</p>
-              <p><strong>Fin:</strong> {proy.fecha_fin ? formatFecha(proy.fecha_fin) : 'No definido'}</p>
+              <p><strong>Estado:</strong> {proy.estado}</p>
+              <p>{proy.descripcion}</p>
+              <p><strong>Inicio:</strong> {new Date(proy.fecha_inicio).toLocaleDateString('es-ES')}</p>
+              <p><strong>Fin:</strong> {new Date(proy.fecha_fin).toLocaleDateString('es-ES')}</p>
             </div>
           ))}
         </div>

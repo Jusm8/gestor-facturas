@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/login';
-import Register from './pages/register';
-import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
 import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
-import Proyectos from './pages/Proyectos';
-import NuevoProyecto from './pages/NuevoProyecto';
-import ProyectoDetalle from './pages/ProyectoDetalle';
-
+import { Navbar, ProtectedRoute } from './components';
+import {
+  Login,
+  Register,
+  Dashboard,
+  Profile,
+  Proyectos,
+  NuevoProyecto,
+  ProyectoDetalle
+} from './pages';
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
