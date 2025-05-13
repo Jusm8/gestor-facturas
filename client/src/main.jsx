@@ -3,14 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
-import {
-  Login,
-  Register,
-  Dashboard,
-  Profile,
-  Proyectos,
-  NuevoProyecto,
-  ProyectoDetalle
+import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle
 } from './pages';
 const rootElement = document.getElementById('root');
 

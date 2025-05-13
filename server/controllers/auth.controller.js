@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
+const { ImGift } = require('react-icons/im');
 
 //Registro de usuario
 exports.register = async (req, res) => {
@@ -28,7 +29,6 @@ exports.register = async (req, res) => {
     res.status(500).json({ error: 'Error en el registro' });
   }
 };
-
 
 //Login de usuario
 exports.login = async (req, res) => {
@@ -62,43 +62,59 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: 'Error en el login' });
   }
 };
-
+const cleanDate = (dateStr) => {
+  if (!dateStr) return null;
+  return new Date(dateStr).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+};
 //Actualizar perfil
 exports.updateProfile = async (req, res) => {
   const {
     idUsuario,
     nombre,
     email,
-    imagen_url,
     fecha_nacimiento,
     sexo,
     localidad
   } = req.body;
+
+  // Si se sube una imagen, obtenemos la ruta generada por multer
+  const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+  console.log({
+    nombre,
+    email,
+    imagen_url,
+    fecha_nacimiento,
+    sexo,
+    localidad,
+    idUsuario
+  });
 
   try {
     const clean = (value) => value === '' ? null : value;
 
     const [result] = await pool.query(
       `UPDATE Usuario SET
-    nombre = ?, 
-    email = ?, 
-    imagen_url = ?, 
-    fecha_nacimiento = ?, 
-    sexo = ?, 
-    localidad = ?
-  WHERE idUsuario = ?`,
+        nombre = ?, 
+        email = ?, 
+        imagen_url = COALESCE (?, imagen_url), 
+        fecha_nacimiento = ?, 
+        sexo = ?, 
+        localidad = ?
+      WHERE idUsuario = ?`,
       [
         clean(nombre),
         clean(email),
-        clean(imagen_url),
-        clean(fecha_nacimiento),
+        imagen_url,
+        cleanDate(fecha_nacimiento),
         clean(sexo),
         clean(localidad),
         idUsuario
       ]
     );
 
-    res.json({ message: 'Perfil actualizado correctamente' });
+    res.json({ message: 'Perfil actualizado correctamente', imagen_url: imagen_url || null })
+
   } catch (error) {
     console.error('Error actualizando perfil:', error);
     res.status(500).json({ error: 'Error actualizando el perfil' });
@@ -114,6 +130,8 @@ exports.crearProyecto = async (req, res) => {
     estado,
     Usuario_idUsuario
   } = req.body;
+
+
 
   try {
     await pool.query(
