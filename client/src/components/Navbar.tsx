@@ -3,7 +3,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import '../assets/styles/Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-
+import Swal from 'sweetalert2';
 
 export default function Navbar() {
 
@@ -12,11 +12,22 @@ export default function Navbar() {
 
   //logout
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    //limpio el contexto
-    setUser(null);
-    navigate('/login');
+    Swal.fire({
+      title: '¿Cerrar sesión?',
+      text: '¿Estás seguro de que quieres cerrar sesión?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    }).then(result => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/login');
+      }
+    });
   };
 
   return (
@@ -29,7 +40,7 @@ export default function Navbar() {
       </div>
       <div className="navbar-right">
         <span className="usuario" onClick={() => navigate('/perfil')}>Usuario</span>
-        <FaUserCircle size={38}/>
+        <FaUserCircle size={38} />
         <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>
 

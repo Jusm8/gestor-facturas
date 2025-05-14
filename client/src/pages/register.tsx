@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../assets/styles/login.css';
+import { showError, showSuccess } from '../components/alert';
 
 export default function Register() {
   const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });
@@ -13,7 +14,7 @@ export default function Register() {
     e.preventDefault();
 
     if (form.password !== form.confirm) {
-      alert('Las contraseñas no coinciden');
+      showError('Las contraseñas no coinciden');
       return;
     }
 
@@ -30,21 +31,21 @@ export default function Register() {
       });
 
       if (response.status === 409) {
-        alert('Este email ya está registrado. Prueba con otro.');
+        showError('Este email ya está registrado. Prueba con otro.');
         return;
       }
 
       const data = await response.json();
 
       if (response.ok) {
-        alert('Registro exitoso');
+        showSuccess('Registro exitoso');
         //Redirigir al login
         navigate('/login');
       } else {
-        alert(data?.error || 'Error al registrar');
+        showError(data?.error || 'Error al registrar');
       }
     } catch (error) {
-      alert('Error de conexión con el servidor');
+      showError('Error de conexión con el servidor');
       console.error('Error en el registro:', error);
     }
   };

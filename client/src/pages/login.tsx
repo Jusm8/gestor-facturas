@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../assets/styles/login.css';
 import { useAuth } from '../context/AuthContext';
+import { showError, showSuccess } from '../components/alert';
 
 export default function Login() {
     const { setUser } = useAuth();
@@ -29,14 +30,14 @@ export default function Login() {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
-                alert('Login exitoso');
+                showSuccess('Login exitoso');
                 window.location.href = '/dashboard';
             } else {
-                alert(data.error || 'Error en el login');
+                showError(data.error || 'Error en el login');
             }
         } catch (error) {
             console.error(error);
-            alert('Error al iniciar sesión');
+            showError('Error al iniciar sesión');
         }
     };
 

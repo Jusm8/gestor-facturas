@@ -3,11 +3,13 @@ import '../assets/styles/Profile.css';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { showSuccess, showError } from '../components/alert';
 
 export default function Profile() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
+  const [imagenFile, setImagenFile] = useState<File | null>(null);
 
   const [form, setForm] = useState({
     nombre: user?.nombre || '',
@@ -26,7 +28,9 @@ export default function Profile() {
         email: user.email || '',
         rol: user.rol || '',
         imagen_url: user.imagen_url || '',
-        fecha_nacimiento: user.fecha_nacimiento || '',
+        fecha_nacimiento: user.fecha_nacimiento
+          ? new Date(user.fecha_nacimiento).toISOString().split('T')[0]
+          : '',
         sexo: user.sexo || '',
         localidad: user.localidad || ''
       });
@@ -42,6 +46,7 @@ export default function Profile() {
     const file = e.target.files?.[0];
     if (file) {
       const url = URL.createObjectURL(file);
+      setImagenFile(file);
       setForm({ ...form, imagen_url: url });
     }
   };
@@ -52,53 +57,60 @@ export default function Profile() {
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // Verifica si los datos han cambiado
-    const hasChanged = Object.keys(form).some(
-      key => form[key as keyof typeof form] !== userData[key]
-    );
+    const formFields = ['nombre', 'email', 'fecha_nacimiento', 'sexo', 'localidad'];
+    const hasChanged = formFields.some(field => form[field as keyof typeof form] !== userData[field])
+      || imagenFile !== null;
 
     if (!hasChanged) {
-      alert('No hay cambios para guardar');
+      showError('No hay cambios para guardar');
       setEditMode(false);
       return;
+    }
+
+    const formData = new FormData();
+    formData.append('idUsuario', userData.id);
+    formData.append('nombre', form.nombre);
+    formData.append('email', form.email);
+    formData.append('fecha_nacimiento', form.fecha_nacimiento);
+    formData.append('sexo', form.sexo);
+    formData.append('localidad', form.localidad);
+
+    if (imagenFile) {
+      formData.append('imagen', imagenFile);
     }
 
     try {
       const response = await fetch('http://localhost:3001/api/auth/update', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          ...form,
-          idUsuario: userData.id
-        })
+        body: formData
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        alert('Perfil actualizado correctamente');
-        localStorage.setItem('user', JSON.stringify({ ...userData, ...form }));
-        setUser({ ...userData, ...form });
+        showSuccess('Perfil actualizado', 'Tu información se ha guardado con éxito');
+        const updatedUser = data.user;
+
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+
+        setForm(prev => ({
+          ...prev,
+          imagen_url: updatedUser.imagen_url
+        }));
+
       } else {
-        alert(data.error || 'Error al actualizar el perfil');
+        showError(data.error || 'Error al actualizar el perfil');
       }
     } catch (error) {
       console.error(error);
-      alert('Error de conexión');
+      showError('Error de conexión');
     }
 
     setEditMode(false);
-  };
-
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/login');
   };
 
   return (
@@ -109,11 +121,15 @@ export default function Profile() {
       <form id="profile-form" className="profile-card" onSubmit={handleSubmit}>
         <div className="profile-img">
           {form.imagen_url ? (
-            <img src={form.imagen_url} alt="Perfil" />
+            <img src={
+              form.imagen_url.startsWith('/uploads/')
+                ? `http://localhost:3001${form.imagen_url}`
+                : form.imagen_url
+            } alt="Perfil" />
           ) : (
             <div className="placeholder-img">Sin imagen</div>
           )}
-          {editMode && <input type="file" onChange={handleImageUpload} />}
+          {editMode && <input type="file" name="imagen" onChange={handleImageUpload} />}
         </div>
 
         <div className="profile-info">
@@ -142,6 +158,7 @@ export default function Profile() {
             name="fecha_nacimiento"
             value={form.fecha_nacimiento}
             onChange={handleChange}
+            max={new Date().toISOString().split("T")[0]}
             disabled={!editMode}
           />
 

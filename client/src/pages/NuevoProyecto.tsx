@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../assets/styles/Proyectos.css';
 import { useNavigate } from 'react-router-dom';
+import { showConfirm, showError, showSuccess } from '../components/alert';
 
 export default function NuevoProyecto() {
   const navigate = useNavigate();
@@ -33,15 +34,15 @@ export default function NuevoProyecto() {
       });
 
       if (response.ok) {
-        alert('Proyecto creado con éxito');
+        showSuccess('Proyecto creado con éxito');
         navigate('/proyectos');
       } else {
         const data = await response.json();
-        alert(data.error || 'Error al crear el proyecto');
+        showError(data.error || 'Error al crear el proyecto');
       }
     } catch (error) {
       console.error(error);
-      alert('Error de conexión');
+      showError('Error de conexión');
     }
   };
 

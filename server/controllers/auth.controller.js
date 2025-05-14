@@ -80,6 +80,7 @@ exports.updateProfile = async (req, res) => {
   // Si se sube una imagen, obtenemos la ruta generada por multer
   const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
 
+  //test
   console.log({
     nombre,
     email,
@@ -113,7 +114,12 @@ exports.updateProfile = async (req, res) => {
       ]
     );
 
-    res.json({ message: 'Perfil actualizado correctamente', imagen_url: imagen_url || null })
+    const [updatedUser] = await pool.query('SELECT * FROM Usuario WHERE idUsuario = ?', [idUsuario]);
+
+    res.json({
+      message: 'Perfil actualizado correctamente',
+      user: updatedUser[0]  
+    });
 
   } catch (error) {
     console.error('Error actualizando perfil:', error);
