@@ -30,10 +30,10 @@ export default function ProyectoDetalle() {
         const fetchData = async () => {
             try {
                 const [presupuestoRes, facturaRes] = await Promise.all([
-                    fetch(`http://localhost:3001/api/proyectos/${id}/presupuestos`, {
+                    fetch(`http://localhost:3001/api/documento/presupuestos/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    fetch(`http://localhost:3001/api/proyectos/${id}/facturas`, {
+                    fetch(`http://localhost:3001/api/documento/facturas/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);

@@ -1,11 +1,11 @@
-// src/utils/alert.ts
 import Swal from 'sweetalert2';
 
-export const showSuccess = (title: string, text?: string) => {
-  Swal.fire({
+export const showSuccess = (title: string, message: string) => {
+  return Swal.fire({
     icon: 'success',
-    title,
-    text,
+    title: message,
+    timer: 1500,
+    timerProgressBar: true,
     confirmButtonColor: '#4760c0'
   });
 };

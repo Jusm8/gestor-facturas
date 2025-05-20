@@ -30,8 +30,9 @@ export default function Login() {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
-                showSuccess('Login exitoso');
-                window.location.href = '/dashboard';
+                showSuccess('Logeo okey', "Login exitoso").then(() => {
+                    window.location.href = '/dashboard';
+                });
             } else {
                 showError(data.error || 'Error en el login');
             }

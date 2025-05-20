@@ -26,5 +26,6 @@ router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
 router.post('/proyecto', authController.crearProyecto);
 router.get('/proyectos/:idUsuario', authController.obtenerProyectosPorUsuario);
+router.post('/presupuestos', authController.crearPresupuesto);
 
 module.exports = router;
