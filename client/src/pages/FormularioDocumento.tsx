@@ -7,7 +7,7 @@ interface Props {
   idProyecto?: string;
 }
 
-export default function FormularioDocumento({ tipo }: Props) {
+export default function FormularioDocumento({ tipo, idProyecto }: Props) {
   const [formulario, setFormulario] = useState({
     fecha: '',
     fecha_validez: '',
@@ -16,11 +16,15 @@ export default function FormularioDocumento({ tipo }: Props) {
     cliente: '',
     proyecto: '',
     forma_pago: '',
-    detalles: [{ cantidad: 1, precio_unitario: 0, producto: '' }]
+    detalles: [{ cantidad: '', precio_unitario: '', producto: '' }]
   });
-  const [clientes, setClientes] = useState<{ idCliente: number, nombre: string }[]>([]);
+  const [clientes, setClientes] = useState<{ idCliente: number, nombre: string, nif: string, email: string }[]>([]);
 
   useEffect(() => {
+    if (idProyecto) {
+      setFormulario(prev => ({ ...prev, proyecto: idProyecto }));
+    }
+
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -43,7 +47,8 @@ export default function FormularioDocumento({ tipo }: Props) {
     };
 
     fetchClientes();
-  }, []);
+  }, [idProyecto]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
@@ -58,7 +63,7 @@ export default function FormularioDocumento({ tipo }: Props) {
   const agregarProducto = () => {
     setFormulario({
       ...formulario,
-      detalles: [...formulario.detalles, { cantidad: 1, precio_unitario: 0, producto: '' }]
+      detalles: [...formulario.detalles, { cantidad: '', precio_unitario: '', producto: '' }]
     });
   };
 
@@ -131,12 +136,14 @@ export default function FormularioDocumento({ tipo }: Props) {
 
       <label>Cliente:</label>
       <select name="cliente" value={formulario.cliente} onChange={handleChange} required>
+        <option value="">Seleccione un cliente</option>
         {clientes.map(cliente => (
           <option key={cliente.idCliente} value={cliente.idCliente}>
-            {cliente.nombre}
+            {cliente.nombre} - {cliente.nif} ({cliente.email})
           </option>
         ))}
       </select>
+
 
       <h4>Detalles:</h4>
       {formulario.detalles.map((detalle, i) => (

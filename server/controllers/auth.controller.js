@@ -282,7 +282,7 @@ exports.crearFactura = async (req, res) => {
   try {
     const [facturaRes] = await connection.query(
       `INSERT INTO Factura (fecha, estado, total, Cliente_idCliente, Proyecto_idProyecto)
-       VALUES (?, ?, 0, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?)`,
       [fecha, estado, Cliente_idCliente, Proyecto_idProyecto]
     );
 
@@ -314,5 +314,16 @@ exports.crearFactura = async (req, res) => {
     res.status(500).json({ error: 'Error al crear factura' });
   } finally {
     connection.release();
+  }
+};
+
+//Obtener clientes
+exports.obtenerClientes = async (req, res) => {
+  try {
+    const [clientes] = await pool.query('SELECT idCliente, nombre, nif, email FROM Cliente WHERE Usuario_idUsuario = ?', [req.params.id]);
+    res.json(clientes);
+  } catch (error) {
+    console.error('Error al obtener clientes:', error);
+    res.status(500).json({ error: 'Error al obtener clientes' });
   }
 };

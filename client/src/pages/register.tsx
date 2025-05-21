@@ -38,7 +38,7 @@ export default function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        showSuccess('Registro exitoso');
+        showSuccess('Registro exitoso', 'Ya puedes iniciar sesión');
         //Redirigir al login
         navigate('/login');
       } else {
