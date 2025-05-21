@@ -4,7 +4,6 @@ import '../assets/styles/Navbar.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
-
 export default function Navbar() {
 
   const { setUser } = useAuth();
@@ -33,7 +32,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="../public/SimplifacLogo_2.png" alt="Logo" className="logo" />
+        <img src="/SimplifacLogo.png" alt="Logo" className="logo" />
         <span className='Dashboard' onClick={() => navigate('/dashboard')}>Home</span>
         <span className='Proyectos' onClick={() => navigate('/Proyectos')}>Proyectos</span>
         <span>More</span>

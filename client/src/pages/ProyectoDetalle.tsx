@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../assets/styles/ProyectoDetalle.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function ProyectoDetalle() {
     const { id } = useParams();
-    
+    const navigate = useNavigate();
     interface Presupuesto {
         idPresupuesto: number;
         cliente: string;
@@ -56,7 +57,14 @@ export default function ProyectoDetalle() {
     return (
         <div className="detalle-container">
             <h2>Listado de Facturas y Presupuestos</h2>
-
+            <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+                <button
+                    className="crear-btn"
+                    onClick={() => navigate(`/proyectos/${id}/crear`)}
+                >
+                    + Nuevo Presupuesto
+                </button>
+            </div>
             {loading ? (
                 <p>Cargando...</p>
             ) : presupuestos.length === 0 && facturas.length === 0 ? (

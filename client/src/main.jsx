@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
-import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle
-} from './pages';
+import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle } from './pages';
+import CrearFormulario from './pages/CrearDocumento';
+
 const rootElement = document.getElementById('root');
 
 if (rootElement) {
@@ -23,6 +24,7 @@ if (rootElement) {
             <Route path="/proyectos" element={ <ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
+            <Route path="/proyectos/:id/crear" element={<CrearFormulario />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

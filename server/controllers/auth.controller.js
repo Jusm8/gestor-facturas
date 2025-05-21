@@ -174,10 +174,9 @@ exports.obtenerProyectosPorUsuario = async (req, res) => {
 exports.getPresupuestosByProyecto = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT p.idPresupuesto, p.fecha, p.estado, c.nombre as cliente, pd.descripcion
+      SELECT p.idPresupuesto, p.fecha, p.estado, c.nombre AS cliente
       FROM Presupuesto p
       JOIN Cliente c ON p.Cliente_idCliente = c.idCliente
-      LEFT JOIN PresupuestoDetalle pd ON pd.Presupuesto_idPresupuesto = p.idPresupuesto
       WHERE p.Proyecto_idProyecto = ?
     `, [req.params.id]);
 
@@ -187,6 +186,7 @@ exports.getPresupuestosByProyecto = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener presupuestos' });
   }
 };
+
 
 //Facturas de un proyecto
 exports.getFacturasByProyecto = async (req, res) => {
@@ -209,6 +209,8 @@ exports.getFacturasByProyecto = async (req, res) => {
 exports.crearPresupuesto = async (req, res) => {
   const {
     fecha,
+    fecha_validez,
+    forma_pago,
     estado,
     Usuario_idUsuario,
     Cliente_idCliente,
@@ -221,9 +223,10 @@ exports.crearPresupuesto = async (req, res) => {
 
   try {
     const [presupuestoRes] = await connection.query(
-      `INSERT INTO Presupuesto (fecha, estado, total, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto)
-       VALUES (?, ?, 0, ?, ?, ?)`,
-      [fecha, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto]
+      `INSERT INTO Presupuesto (fecha, fecha_validez, forma_pago, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [fecha, fecha_validez, forma_pago, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto]
+
     );
 
     const presupuestoId = presupuestoRes.insertId;

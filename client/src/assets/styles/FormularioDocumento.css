@@ -1,0 +1,87 @@
+.crear-formulario-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slider-toggle {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.slider-toggle button {
+  background-color: #e0e0e0;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  cursor: pointer;
+  margin: 0 0.5rem;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.slider-toggle button.active {
+  background-color: #4a90e2;
+  color: white;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+form h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+form label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+form input,
+form select {
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.detalle-item {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.detalle-item input {
+  flex: 1;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+button[type="submit"],
+button[type="button"] {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button[type="submit"]:hover,
+button[type="button"]:hover {
+  background-color: #357ac3;
+}
