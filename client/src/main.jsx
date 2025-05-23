@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
 import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle } from './pages';
 import CrearFormulario from './pages/CrearDocumento';
+import FormularioDocumento from './pages/FormularioDocumento';
 
 const rootElement = document.getElementById('root');
 
@@ -19,12 +20,13 @@ if (rootElement) {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /></ProtectedRoute>} />
-            <Route path="/dashboard" element={ <ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
-            <Route path="/perfil" element={ <ProtectedRoute> <Profile /> </ProtectedRoute> } />
-            <Route path="/proyectos" element={ <ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
+            <Route path="/perfil" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
+            <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
             <Route path="/proyectos/:id/crear" element={<CrearFormulario />} />
+            <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento modo="editar" />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

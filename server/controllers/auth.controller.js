@@ -187,7 +187,6 @@ exports.getPresupuestosByProyecto = async (req, res) => {
   }
 };
 
-
 //Facturas de un proyecto
 exports.getFacturasByProyecto = async (req, res) => {
   try {

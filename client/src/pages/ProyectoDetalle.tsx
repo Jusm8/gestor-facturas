@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../assets/styles/ProyectoDetalle.css';
 import { useNavigate } from 'react-router-dom';
+import { showSuccess, showError, showConfirm } from '../components/alert';
 
 export default function ProyectoDetalle() {
     const { id } = useParams();
@@ -54,15 +55,46 @@ export default function ProyectoDetalle() {
         fetchData();
     }, [id]);
 
+    const handleEliminar = async (tipo: 'factura' | 'presupuesto', id: number) => {
+        const token = localStorage.getItem('token');
+        const confirm = await showConfirm(`¿Eliminar ${tipo}?`, 'Esta acción no se puede deshacer');
+        if (!confirm) return;
+
+        try {
+            const res = await fetch(`http://localhost:3001/api/documento/${tipo}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                await showSuccess('Eliminado', `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} eliminado correctamente`);
+                // Recarga la página o vuelve a cargar datos
+                window.location.reload();
+            } else {
+                const data = await res.json();
+                showError('Error', data.error || 'Error al eliminar');
+            }
+        } catch (error) {
+            console.error(error);
+            showError('Error', 'Error al conectar con el servidor');
+        }
+    };
+
     return (
         <div className="detalle-container">
+            <button className="btn-volver" onClick={() => navigate('/proyectos')} style={{ marginBottom: '1rem' }}>
+                ← Volver a Proyectos
+            </button>
+
             <h2>Listado de Facturas y Presupuestos</h2>
             <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
                 <button
                     className="crear-btn"
                     onClick={() => navigate(`/proyectos/${id}/crear`)}
                 >
-                    + Nuevo Presupuesto
+                    + Nuevo Documento
                 </button>
             </div>
             {loading ? (
@@ -78,25 +110,34 @@ export default function ProyectoDetalle() {
                             <th>Tipo</th>
                             <th>Descripción</th>
                             <th>Detalles</th>
+                            <th>Aciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {presupuestos.map(p => (
-                            <tr key={`p-${p.idPresupuesto}`}>
+                        {presupuestos.map((p, i) => (
+                            <tr key={`presupuesto-${p.idPresupuesto}-${p.fecha}-${i}`}>
                                 <td>{p.cliente}</td>
                                 <td>{new Date(p.fecha).toLocaleDateString('es-ES')}</td>
                                 <td>Presupuesto</td>
                                 <td>{p.descripcion || 'N/A'}</td>
                                 <td>👁</td>
+                                <td>
+                                    <button aria-label="Editar presupuesto" onClick={() => navigate(`/documento/presupuesto/editar/${p.idPresupuesto}`)}>✏️</button>
+                                    <button aria-label="Eliminar presupuesto" onClick={() => handleEliminar('presupuesto', p.idPresupuesto)}>🗑️</button>
+                                </td>
                             </tr>
                         ))}
-                        {facturas.map(f => (
-                            <tr key={`f-${f.idFactura}`}>
+                        {facturas.map((f, i) => (
+                            <tr key={`factura-${f.idFactura}-${f.fecha}-${i}`}>
                                 <td>{f.cliente}</td>
                                 <td>{new Date(f.fecha).toLocaleDateString('es-ES')}</td>
                                 <td>Factura</td>
                                 <td>{f.descripcion || 'N/A'}</td>
                                 <td>👁</td>
+                                <td>
+                                    <button onClick={() => navigate(`/documento/factura/editar/${f.idFactura}`)}>✏️</button>
+                                    <button onClick={() => handleEliminar('factura', f.idFactura)}>🗑️</button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

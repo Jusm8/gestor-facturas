@@ -2,7 +2,7 @@
   padding: 2rem;
   background: white;
   border-radius: 10px;
-  margin: 2rem;
+  margin: 1rem 2rem 2rem 2rem;
 }
 
 .detalle-container h2 {
@@ -42,4 +42,25 @@ th, td {
 
 .crear-btn:hover {
   background-color: #45a049;
+}
+
+.btn-volver {
+  background-color: #e6f7ff;
+  color: #1890ff;
+  border: 1px solid #91d5ff;
+  padding: 8px 16px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-volver:hover {
+  background-color: #bae7ff;
+  border-color: #40a9ff;
+  color: #096dd9;
+  transform: translateX(-2px);
 }

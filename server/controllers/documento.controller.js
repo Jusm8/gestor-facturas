@@ -3,7 +3,7 @@ const pool = require('../db');
 // Crear Presupuesto
 exports.crearPresupuesto = async (req, res) => {
   const {
-    fecha, total, estado,
+    fecha, fecha_validez, forma_pago, total, estado,
     Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto,
     detalles
   } = req.body;
@@ -13,9 +13,9 @@ exports.crearPresupuesto = async (req, res) => {
     await conn.beginTransaction();
 
     const [presupuestoResult] = await conn.query(`
-      INSERT INTO Presupuesto (fecha, total, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto)
-      VALUES (?, ?, ?, ?, ?, ?)`,
-      [fecha, total, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto]
+      INSERT INTO Presupuesto (fecha, fecha_validez, forma_pago, total, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [fecha, fecha_validez || null, forma_pago, total, estado, Usuario_idUsuario, Cliente_idCliente, Proyecto_idProyecto]
     );
 
     const idPresupuesto = presupuestoResult.insertId;
@@ -61,11 +61,10 @@ exports.getPresupuestosByProyecto = async (req, res) => {
 
     res.json(rows);
   } catch (error) {
-    console.error('Error al obtener presupuestos:', error); 
+    console.error('Error al obtener presupuestos:', error);
     res.status(500).json({ error: 'Error al obtener presupuestos' });
   }
 };
-
 
 //Facturas de un proyecto
 exports.getFacturasByProyecto = async (req, res) => {
@@ -85,42 +84,126 @@ exports.getFacturasByProyecto = async (req, res) => {
   }
 };
 
-
 // Crear Factura
 exports.crearFactura = async (req, res) => {
   const {
-    fecha, total, estado,
-    Cliente_idCliente, Proyecto_idProyecto,
-    detalles
+    fecha,
+    fecha_validez,
+    forma_pago,
+    estado,
+    Cliente_idCliente,
+    Proyecto_idProyecto,
+    detalles,
+    iva = 21,
+    retencion = 0
   } = req.body;
 
   const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
+  await conn.beginTransaction();
 
-    const [facturaResult] = await conn.query(`
-      INSERT INTO Factura (fecha, total, estado, Cliente_idCliente, Proyecto_idProyecto)
-      VALUES (?, ?, ?, ?, ?)`,
-      [fecha, total, estado, Cliente_idCliente, Proyecto_idProyecto]
+  try {
+    //Factura base
+    const [facturaRes] = await conn.query(
+      `INSERT INTO Factura (fecha, fecha_validez, forma_pago, estado, Cliente_idCliente, Proyecto_idProyecto, iva, retencion, total)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+      [fecha, fecha_validez || null, forma_pago, estado, Cliente_idCliente, Proyecto_idProyecto, iva, retencion]
     );
 
-    const idFactura = facturaResult.insertId;
+    const idFactura = facturaRes.insertId;
+    let baseImponible = 0;
 
     for (const item of detalles) {
-      await conn.query(`
-        INSERT INTO FacturaDetalle (cantidad, precio_unitario, Factura_idFactura, Producto_idProducto)
-        VALUES (?, ?, ?, ?)`,
-        [item.cantidad, item.precio_unitario, idFactura, item.Producto_idProducto]
+      await conn.query(
+        `INSERT INTO FacturaDetalle (cantidad, precio_unitario, descripcion, Factura_idFactura, Producto_idProducto)
+         VALUES (?, ?, ?, ?, ?)`,
+        [item.cantidad, item.precio_unitario, item.descripcion, idFactura, item.Producto_idProducto]
       );
+
+      baseImponible += item.cantidad * item.precio_unitario;
     }
 
+    //Calculo total con IVA y retención
+    const total =
+      baseImponible +
+      (baseImponible * (iva / 100)) -
+      (baseImponible * (retencion / 100));
+
+    await conn.query(
+      `UPDATE Factura SET total = ? WHERE idFactura = ?`,
+      [total, idFactura]
+    );
+
     await conn.commit();
-    res.status(201).json({ message: 'Factura creada correctamente' });
-  } catch (err) {
+    res.status(201).json({ message: 'Factura creada correctamente', id: idFactura });
+  } catch (error) {
     await conn.rollback();
-    console.error(err);
-    res.status(500).json({ error: 'Error al crear la factura' });
+    console.error('Error al crear factura:', error);
+    res.status(500).json({ error: 'Error al crear factura' });
   } finally {
     conn.release();
+  }
+};
+
+exports.eliminarPresupuesto = async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM Producto_has_PresupuestoDetalle WHERE PresupuestoDetalle_idPresupuestoDetalle IN (SELECT idPresupuestoDetalle FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?)', [id]);
+    await pool.query('DELETE FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?', [id]);
+    await pool.query('DELETE FROM Presupuesto WHERE idPresupuesto = ?', [id]);
+    res.json({ message: 'Presupuesto eliminado' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al eliminar presupuesto' });
+  }
+};
+
+exports.eliminarFactura = async (req, res) => {
+  const id = req.params.id;
+  try {
+    await pool.query('DELETE FROM FacturaDetalle WHERE Factura_idFactura = ?', [id]);
+    await pool.query('DELETE FROM Factura WHERE idFactura = ?', [id]);
+    res.json({ message: 'Factura eliminada' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al eliminar factura' });
+  }
+};
+
+exports.getFacturaById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [facturaRows] = await pool.query('SELECT * FROM Factura WHERE idFactura = ?', [id]);
+    if (!facturaRows.length) {
+      return res.status(404).json({ error: 'Factura no encontrada' });
+    }
+
+    const [detalles] = await pool.query('SELECT * FROM FacturaDetalle WHERE Factura_idFactura = ?', [id]);
+
+    res.json({ ...facturaRows[0], detalles });
+  } catch (error) {
+    console.error('Error al obtener factura:', error);
+    res.status(500).json({ error: 'Error al obtener factura' });
+  }
+};
+
+exports.getPresupuestoById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [presupuestoRows] = await pool.query('SELECT * FROM Presupuesto WHERE idPresupuesto = ?', [id]);
+    if (!presupuestoRows.length) {
+      return res.status(404).json({ error: 'Presupuesto no encontrado' });
+    }
+
+    const [detalles] = await pool.query(`
+      SELECT pd.*, php.Producto_idProducto
+      FROM PresupuestoDetalle pd
+      LEFT JOIN Producto_has_PresupuestoDetalle php
+      ON pd.idPresupuestoDetalle = php.PresupuestoDetalle_idPresupuestoDetalle
+      WHERE pd.Presupuesto_idPresupuesto = ?`, [id]);
+
+    res.json({ ...presupuestoRows[0], detalles });
+  } catch (error) {
+    console.error('Error al obtener presupuesto:', error);
+    res.status(500).json({ error: 'Error al obtener presupuesto' });
   }
 };

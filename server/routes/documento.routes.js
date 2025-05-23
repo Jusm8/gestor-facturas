@@ -12,4 +12,8 @@ router.post('/factura', documentoController.crearFactura);
 router.get('/presupuestos/:id', documentoController.getPresupuestosByProyecto);
 router.get('/facturas/:id', documentoController.getFacturasByProyecto);
 
+//Eliminar presupuestos y facturas
+router.delete('/presupuesto/:id', documentoController.eliminarPresupuesto);
+router.delete('/factura/:id', documentoController.eliminarFactura);
+
 module.exports = router;
