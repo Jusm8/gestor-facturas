@@ -1,0 +1,186 @@
+/* CONTENEDOR GENERAL */
+.factura-detalle {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border: 1px solid #ccc;
+  font-family: 'Segoe UI', sans-serif;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* CABECERA */
+.factura-detalle header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cabecera-presupuesto {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.titulo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #0073e6;
+  margin: 0;
+}
+
+.subtitulo {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0.5rem 0;
+}
+
+/* INFORMACIÓN DE FACTURA */
+.factura-detalle .factura-info p {
+  margin: 0.2rem 0;
+}
+
+/* CLIENTE */
+.cliente-info {
+  background: #e6f4ff;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-left: 4px solid #0077cc;
+}
+
+/* TABLA */
+.factura-detalle table {
+  width: 100%;
+  margin-top: 2rem;
+  border-collapse: collapse;
+}
+
+.factura-detalle th {
+  background-color: #0077cc;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+  border-right: 2px solid white;
+}
+
+.factura-detalle th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.factura-detalle th:last-child {
+  border-top-right-radius: 8px;
+  border-right: none;
+}
+
+.factura-detalle td {
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+.factura-detalle tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* TOTALES */
+.totales {
+  text-align: right;
+  margin-top: 2rem;
+}
+
+.totales p {
+  margin: 0.4rem 0;
+}
+
+.total-final {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #0077cc;
+}
+
+/* PDF STYLING */
+#factura-pdf {
+  background: white;
+  color: black;
+  padding: 2rem;
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  font-size: 14px;
+  max-width: 21cm;
+  width: 100%;
+  margin: auto;
+}
+
+#factura-pdf table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+#factura-pdf th,
+#factura-pdf td {
+  border: 1px solid #888;
+  padding: 10px;
+  text-align: center;
+}
+
+#factura-pdf th {
+  background-color: #0077cc !important;
+  color: white !important;
+  border: 1px solid white;
+}
+
+/* BOTONES */
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 2rem;
+}
+
+.btn-pdf, .btn-volver {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-pdf {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+}
+
+.btn-pdf:hover {
+  background-color: #005fa3;
+  transform: scale(1.03);
+}
+
+.btn-volver {
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.btn-volver:hover {
+  background-color: #e2e2e2;
+  transform: scale(1.03);
+}
+
+/* EFECTO CLICK */
+.btn-pdf:active,
+.btn-volver:active {
+  transform: scale(0.98);
+}
+
+/* ELEMENTOS QUE NO SE IMPRIMEN */
+.no-pdf {
+  display: block;
+}
+
+@media print {
+  .no-pdf {
+    display: none !important;
+  }
+}

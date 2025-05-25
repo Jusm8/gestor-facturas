@@ -19,4 +19,7 @@ router.delete('/factura/:id', documentoController.eliminarFactura);
 //Obtener presupuesto por id
 router.get('/presupuesto/:id', documentoController.getPresupuestoById);
 
+//Obtener factura por id
+router.get('/factura/:id', documentoController.getFacturaById);
+
 module.exports = router;

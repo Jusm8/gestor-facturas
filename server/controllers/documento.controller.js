@@ -195,6 +195,7 @@ exports.getFacturaById = async (req, res) => {
   }
 };
 
+//Presupuesto
 exports.getPresupuestoById = async (req, res) => {
   const id = req.params.id;
   try {
@@ -232,5 +233,35 @@ exports.getPresupuestoById = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener presupuesto:', error);
     res.status(500).json({ error: 'Error al obtener presupuesto' });
+  }
+};
+
+//Factura
+exports.getFacturaById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const [facturaRows] = await pool.query('SELECT * FROM Factura WHERE idFactura = ?', [id]);
+    if (!facturaRows.length) {
+      return res.status(404).json({ error: 'Factura no encontrada' });
+    }
+
+    const [detalles] = await pool.query(`
+      SELECT fd.*, p.descripcion
+      FROM FacturaDetalle fd
+      LEFT JOIN Producto p ON p.idProducto = fd.Producto_idProducto
+      WHERE fd.Factura_idFactura = ?`, [id]);
+
+    const clienteId = facturaRows[0].Cliente_idCliente;
+    const [clienteRows] = await pool.query('SELECT nombre, nif FROM Cliente WHERE idCliente = ?', [clienteId]);
+
+    res.json({
+      ...facturaRows[0],
+      cliente_nombre: clienteRows[0]?.nombre || '',
+      nif: clienteRows[0]?.nif || '',
+      detalles
+    });
+  } catch (error) {
+    console.error('Error al obtener factura:', error);
+    res.status(500).json({ error: 'Error al obtener factura' });
   }
 };

@@ -7,6 +7,7 @@ import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, Proyecto
 import CrearFormulario from './pages/CrearDocumento';
 import FormularioDocumento from './pages/FormularioDocumento';
 import DetallePresupuesto from './pages/DetallePresupuesto';
+import DetalleFactura from './pages/DetalleFactura';
 
 const rootElement = document.getElementById('root');
 
@@ -29,6 +30,7 @@ if (rootElement) {
             <Route path="/proyectos/:id/crear" element={<CrearFormulario />} />
             <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento modo="editar" />} />
             <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
+            <Route path="/factura/:id" element={<ProtectedRoute><DetalleFactura /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
