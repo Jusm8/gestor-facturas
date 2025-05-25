@@ -6,6 +6,7 @@ import { Navbar, ProtectedRoute } from './components';
 import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle } from './pages';
 import CrearFormulario from './pages/CrearDocumento';
 import FormularioDocumento from './pages/FormularioDocumento';
+import DetallePresupuesto from './pages/DetallePresupuesto';
 
 const rootElement = document.getElementById('root');
 
@@ -27,6 +28,7 @@ if (rootElement) {
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
             <Route path="/proyectos/:id/crear" element={<CrearFormulario />} />
             <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento modo="editar" />} />
+            <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

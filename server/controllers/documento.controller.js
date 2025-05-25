@@ -22,9 +22,9 @@ exports.crearPresupuesto = async (req, res) => {
 
     for (const item of detalles) {
       await conn.query(`
-        INSERT INTO PresupuestoDetalle (cantidad, precio_unitario, Presupuesto_idPresupuesto)
-        VALUES (?, ?, ?)`,
-        [item.cantidad, item.precio_unitario, idPresupuesto]
+        INSERT INTO PresupuestoDetalle (cantidad, precio_unitario, descripcion, Presupuesto_idPresupuesto)
+        VALUES (?, ?, ?, ?)`,
+        [item.cantidad, item.precio_unitario, item.descripcion || null, idPresupuesto]
       );
 
       await conn.query(`
@@ -47,17 +47,21 @@ exports.crearPresupuesto = async (req, res) => {
 
 exports.getPresupuestosByProyecto = async (req, res) => {
   const idProyecto = req.params.id;
-  console.log('Buscando presupuestos para proyecto:', idProyecto);
 
   try {
     const [rows] = await pool.query(`
-      SELECT p.idPresupuesto, p.fecha, p.estado, c.nombre as cliente
+      SELECT 
+        p.idPresupuesto, 
+        p.fecha, 
+        p.estado, 
+        c.nombre as cliente, 
+        GROUP_CONCAT(pd.descripcion SEPARATOR ', ') AS descripcion
       FROM Presupuesto p
       JOIN Cliente c ON p.Cliente_idCliente = c.idCliente
       LEFT JOIN PresupuestoDetalle pd ON pd.Presupuesto_idPresupuesto = p.idPresupuesto
-      WHERE p.Proyecto_idProyecto = ?`,
-      [idProyecto]
-    );
+      WHERE p.Proyecto_idProyecto = ?
+      GROUP BY p.idPresupuesto, p.fecha, p.estado, c.nombre
+    `, [idProyecto]);
 
     res.json(rows);
   } catch (error) {
@@ -71,7 +75,12 @@ exports.getFacturasByProyecto = async (req, res) => {
   const idProyecto = req.params.id;
   try {
     const [rows] = await pool.query(`
-      SELECT f.idFactura, f.fecha, f.estado, c.nombre as cliente, fd.precio_unitario as descripcion
+      SELECT 
+        f.idFactura, 
+        f.fecha, 
+        f.estado, 
+        c.nombre as cliente, 
+        fd.descripcion
       FROM Factura f
       JOIN Cliente c ON f.Cliente_idCliente = c.idCliente
       LEFT JOIN FacturaDetalle fd ON fd.Factura_idFactura = f.idFactura
@@ -189,19 +198,37 @@ exports.getFacturaById = async (req, res) => {
 exports.getPresupuestoById = async (req, res) => {
   const id = req.params.id;
   try {
-    const [presupuestoRows] = await pool.query('SELECT * FROM Presupuesto WHERE idPresupuesto = ?', [id]);
+    const [presupuestoRows] = await pool.query(`
+      SELECT p.*, c.nombre AS cliente_nombre, c.email AS cliente_email, c.nif, c.direccion
+      FROM Presupuesto p
+      JOIN Cliente c ON p.Cliente_idCliente = c.idCliente
+      WHERE p.idPresupuesto = ?
+    `, [id]);
+
     if (!presupuestoRows.length) {
       return res.status(404).json({ error: 'Presupuesto no encontrado' });
     }
 
-    const [detalles] = await pool.query(`
-      SELECT pd.*, php.Producto_idProducto
-      FROM PresupuestoDetalle pd
-      LEFT JOIN Producto_has_PresupuestoDetalle php
-      ON pd.idPresupuestoDetalle = php.PresupuestoDetalle_idPresupuestoDetalle
-      WHERE pd.Presupuesto_idPresupuesto = ?`, [id]);
+    const presupuesto = presupuestoRows[0];
 
-    res.json({ ...presupuestoRows[0], detalles });
+    const [detalles] = await pool.query(`
+      SELECT 
+        pd.idPresupuestoDetalle,
+        pd.descripcion,
+        pd.cantidad,
+        pd.precio_unitario,
+        php.Producto_idProducto,
+        pr.nombre AS nombre_producto
+      FROM PresupuestoDetalle pd
+      LEFT JOIN Producto_has_PresupuestoDetalle php 
+        ON pd.idPresupuestoDetalle = php.PresupuestoDetalle_idPresupuestoDetalle
+      LEFT JOIN Producto pr 
+        ON pr.idProducto = php.Producto_idProducto
+      WHERE pd.Presupuesto_idPresupuesto = ?
+    `, [id]);
+
+    res.json({ ...presupuesto, detalles });
+
   } catch (error) {
     console.error('Error al obtener presupuesto:', error);
     res.status(500).json({ error: 'Error al obtener presupuesto' });

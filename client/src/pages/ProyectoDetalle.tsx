@@ -109,7 +109,7 @@ export default function ProyectoDetalle() {
                             <th>Fecha</th>
                             <th>Tipo</th>
                             <th>Descripción</th>
-                            <th>Detalles</th>
+                            <th>Ver</th>
                             <th>Aciones</th>
                         </tr>
                     </thead>
@@ -120,7 +120,9 @@ export default function ProyectoDetalle() {
                                 <td>{new Date(p.fecha).toLocaleDateString('es-ES')}</td>
                                 <td>Presupuesto</td>
                                 <td>{p.descripcion || 'N/A'}</td>
-                                <td>👁</td>
+                                <td>
+                                    <button onClick={() => navigate(`/presupuesto/${p.idPresupuesto}/detalle`)}>👁</button>
+                                </td>
                                 <td>
                                     <button aria-label="Editar presupuesto" onClick={() => navigate(`/documento/presupuesto/editar/${p.idPresupuesto}`)}>✏️</button>
                                     <button aria-label="Eliminar presupuesto" onClick={() => handleEliminar('presupuesto', p.idPresupuesto)}>🗑️</button>

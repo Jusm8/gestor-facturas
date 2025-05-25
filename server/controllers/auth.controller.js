@@ -236,9 +236,9 @@ exports.crearPresupuesto = async (req, res) => {
       const { Producto_idProducto, cantidad, precio_unitario } = detalle;
 
       await connection.query(
-        `INSERT INTO PresupuestoDetalle (cantidad, precio_unitario, Presupuesto_idPresupuesto)
-         VALUES (?, ?, ?)`,
-        [cantidad, precio_unitario, presupuestoId]
+        `INSERT INTO PresupuestoDetalle (cantidad, precio_unitario, descripcion, Presupuesto_idPresupuesto)
+        VALUES (?, ?, ?, ?)`,
+        [cantidad, precio_unitario, detalle.descripcion, presupuestoId]
       );
 
       await connection.query(
