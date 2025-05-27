@@ -61,7 +61,7 @@ export default function Proyectos() {
       if (result.isConfirmed) {
         try {
           const token = localStorage.getItem('token');
-          const res = await fetch(`http://localhost:3001/api/proyectos/${idProyecto}`, {
+          const res = await fetch(`http://localhost:3001/api/auth/proyectos/${idProyecto}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -100,24 +100,31 @@ export default function Proyectos() {
       ) : (
         <div className="proyecto-lista">
           {proyectos.map((proy) => (
-            <div className="proyecto-card" key={proy.idProyecto}>
+            <div className="proyecto-card" key={proy.idProyecto} onClick={() => navigate(`/proyectos/${proy.idProyecto}`)}>
               <div className="proyecto-header">
                 <h3>{proy.nombre}</h3>
                 <div className="proyecto-actions">
                   <button
                     className="btn-icon"
-                    onClick={() => handleEditar(proy.idProyecto)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditar(proy.idProyecto);
+                    }}
                     title="Editar proyecto"
                   >
                     ✏️
                   </button>
                   <button
                     className="btn-icon"
-                    onClick={() => handleEliminar(proy.idProyecto)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEliminar(proy.idProyecto);
+                    }}
                     title="Eliminar proyecto"
                   >
                     🗑️
                   </button>
+
                 </div>
               </div>
               <p><strong>Estado:</strong> {proy.estado}</p>

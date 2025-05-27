@@ -20,7 +20,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
