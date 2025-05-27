@@ -138,3 +138,49 @@ td button:last-child:hover {
   gap: 1rem;
   margin-top: 1.5rem;
 }
+
+input[readonly] {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}
+
+.detalle-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.detalle-inputs {
+  display: flex;
+  flex: 1;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.detalle-inputs input {
+  flex: 1;
+  padding: 8px;
+  font-size: 1rem;
+}
+
+.btn-eliminar {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color 0.2s;
+  margin-top: 2px;
+}
+
+.btn-eliminar:hover {
+  background-color: #b02a37;
+}

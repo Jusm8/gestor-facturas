@@ -34,7 +34,7 @@ export default function NuevoProyecto() {
       });
 
       if (response.ok) {
-        showSuccess('Proyecto creado con éxito');
+        showSuccess('Proyecto creado con éxito', 'El proyecto se ha creado correctamente');
         navigate('/proyectos');
       } else {
         const data = await response.json();

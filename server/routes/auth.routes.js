@@ -28,5 +28,6 @@ router.post('/proyecto', authController.crearProyecto);
 router.get('/proyectos/:idUsuario', authController.obtenerProyectosPorUsuario);
 router.post('/presupuestos', authController.crearPresupuesto);
 router.get('/clientes/:id', authController.obtenerClientes);
+router.delete('/proyectos/:id', authController.eliminarProyecto);
 
 module.exports = router;

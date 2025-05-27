@@ -138,8 +138,6 @@ exports.crearProyecto = async (req, res) => {
     Usuario_idUsuario
   } = req.body;
 
-
-
   try {
     await pool.query(
       `INSERT INTO Proyecto (nombre, descripcion, fecha_inicio, fecha_fin, estado, Usuario_idUsuario)
@@ -324,5 +322,45 @@ exports.obtenerClientes = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener clientes:', error);
     res.status(500).json({ error: 'Error al obtener clientes' });
+  }
+};
+
+exports.eliminarProyecto = async (req, res) => {
+  const id = req.params.id;
+
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    //Eliminar presupuestos relacionados
+    const [presupuestos] = await conn.query(
+      'SELECT idPresupuesto FROM Presupuesto WHERE Proyecto_idProyecto = ?', [id]
+    );
+    for (const presupuesto of presupuestos) {
+      await conn.query('DELETE FROM Producto_has_PresupuestoDetalle WHERE PresupuestoDetalle_idPresupuestoDetalle IN (SELECT idPresupuestoDetalle FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?)', [presupuesto.idPresupuesto]);
+      await conn.query('DELETE FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?', [presupuesto.idPresupuesto]);
+      await conn.query('DELETE FROM Presupuesto WHERE idPresupuesto = ?', [presupuesto.idPresupuesto]);
+    }
+
+    //Eliminar facturas relacionadas
+    const [facturas] = await conn.query(
+      'SELECT idFactura FROM Factura WHERE Proyecto_idProyecto = ?', [id]
+    );
+    for (const factura of facturas) {
+      await conn.query('DELETE FROM FacturaDetalle WHERE Factura_idFactura = ?', [factura.idFactura]);
+      await conn.query('DELETE FROM Factura WHERE idFactura = ?', [factura.idFactura]);
+    }
+
+    //Eliminar el proyecto
+    await conn.query('DELETE FROM Proyecto WHERE idProyecto = ?', [id]);
+
+    await conn.commit();
+    res.json({ message: 'Proyecto eliminado correctamente' });
+  } catch (error) {
+    await conn.rollback();
+    console.error('Error al eliminar proyecto:', error);
+    res.status(500).json({ error: 'Error al eliminar el proyecto' });
+  } finally {
+    conn.release();
   }
 };

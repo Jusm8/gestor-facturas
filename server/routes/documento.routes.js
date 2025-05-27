@@ -2,10 +2,21 @@ const express = require('express');
 const router = express.Router();
 const documentoController = require('../controllers/documento.controller');
 
-//Crear un presupuesto
-router.post('/presupuesto', documentoController.crearPresupuesto);
+const {
+    crearPresupuesto,
+    crearFactura,
+    getPresupuestosByProyecto,
+    getFacturasByProyecto,
+    eliminarPresupuesto,
+    eliminarFactura,
+    getPresupuestoById,
+    getFacturaById,
+    editarPresupuesto,
+    editarFactura
+} = require('../controllers/documento.controller');
 
-//Crear una factura
+//Crear un presupuesto y factura
+router.post('/presupuesto', documentoController.crearPresupuesto);
 router.post('/factura', documentoController.crearFactura);
 
 //Mostrar presupuestos y facturas de un proyecto
@@ -16,10 +27,12 @@ router.get('/facturas/:id', documentoController.getFacturasByProyecto);
 router.delete('/presupuesto/:id', documentoController.eliminarPresupuesto);
 router.delete('/factura/:id', documentoController.eliminarFactura);
 
-//Obtener presupuesto por id
+//Obtener presupuesto  y factura por id
 router.get('/presupuesto/:id', documentoController.getPresupuestoById);
-
-//Obtener factura por id
 router.get('/factura/:id', documentoController.getFacturaById);
+
+//Editar presupuesto y factura
+router.put('/presupuesto/:id', documentoController.editarPresupuesto);
+router.put('/factura/:id', documentoController.editarFactura);
 
 module.exports = router;

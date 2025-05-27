@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
 import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle } from './pages';
-import CrearFormulario from './pages/CrearDocumento';
 import FormularioDocumento from './pages/FormularioDocumento';
 import DetallePresupuesto from './pages/DetallePresupuesto';
 import DetalleFactura from './pages/DetalleFactura';
@@ -27,8 +26,8 @@ if (rootElement) {
             <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
-            <Route path="/proyectos/:id/crear" element={<CrearFormulario />} />
-            <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento modo="editar" />} />
+            <Route path="/proyectos/:id/crear/:tipo" element={<FormularioDocumento />} />
+            <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento />} />
             <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
             <Route path="/factura/:id" element={<ProtectedRoute><DetalleFactura /></ProtectedRoute>} />
           </Routes>

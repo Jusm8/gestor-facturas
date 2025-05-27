@@ -1,4 +1,3 @@
-/* CONTENEDOR GENERAL */
 .factura-detalle {
   max-width: 900px;
   margin: 2rem auto;
@@ -9,7 +8,6 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* CABECERA */
 .factura-detalle header {
   display: flex;
   justify-content: space-between;
@@ -34,12 +32,10 @@
   margin: 0.5rem 0;
 }
 
-/* INFORMACIÓN DE FACTURA */
 .factura-detalle .factura-info p {
   margin: 0.2rem 0;
 }
 
-/* CLIENTE */
 .cliente-info {
   background: #e6f4ff;
   padding: 1rem;
@@ -47,7 +43,6 @@
   border-left: 4px solid #0077cc;
 }
 
-/* TABLA */
 .factura-detalle table {
   width: 100%;
   margin-top: 2rem;
@@ -82,7 +77,6 @@
   background-color: #f9f9f9;
 }
 
-/* TOTALES */
 .totales {
   text-align: right;
   margin-top: 2rem;
@@ -98,7 +92,6 @@
   color: #0077cc;
 }
 
-/* PDF STYLING */
 #factura-pdf {
   background: white;
   color: black;
@@ -129,7 +122,6 @@
   border: 1px solid white;
 }
 
-/* BOTONES */
 .buttons-container {
   display: flex;
   justify-content: center;
@@ -168,13 +160,11 @@
   transform: scale(1.03);
 }
 
-/* EFECTO CLICK */
 .btn-pdf:active,
 .btn-volver:active {
   transform: scale(0.98);
 }
 
-/* ELEMENTOS QUE NO SE IMPRIMEN */
 .no-pdf {
   display: block;
 }
