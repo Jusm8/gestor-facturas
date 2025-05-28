@@ -1,6 +1,6 @@
 const pool = require('../db');
 
-// Crear Presupuesto
+//Crear Presupuesto
 exports.crearPresupuesto = async (req, res) => {
   const {
     fecha, fecha_validez, forma_pago, total, estado,
@@ -98,7 +98,7 @@ exports.getFacturasByProyecto = async (req, res) => {
   }
 };
 
-// Crear Factura
+//Crear Factura
 exports.crearFactura = async (req, res) => {
   const {
     fecha,
@@ -280,7 +280,7 @@ exports.editarPresupuesto = async (req, res) => {
     detalles
   } = req.body;
 
-  // Convertir fechas a formato YYYY-MM-DD
+  //Convertir fechas a formato YYYY-MM-DD
   const fechaSQL = new Date(fecha).toISOString().split('T')[0];
   const fechaValidezSQL = fecha_validez ? new Date(fecha_validez).toISOString().split('T')[0] : null;
 

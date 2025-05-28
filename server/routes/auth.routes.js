@@ -20,13 +20,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+//Autenticación
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
-router.post('/proyecto', authController.crearProyecto);
-router.get('/proyectos/:idUsuario', authController.obtenerProyectosPorUsuario);
+
+//Proyectos
+router.post('/proyecto', authController.crearProyecto);                          // Crear proyecto
+router.get('/proyectos/usuario/:idUsuario', authController.obtenerProyectosPorUsuario); // Listar proyectos de usuario
+router.get('/proyectos/:id/editar', authController.obtenerProyectoById);        // Obtener datos para editar
+router.put('/proyectos/:id', authController.editarProyecto);                    // Actualizar
+router.delete('/proyectos/:id', authController.eliminarProyecto);               // Eliminar
+
+//Presupuestos y Clientes
 router.post('/presupuestos', authController.crearPresupuesto);
 router.get('/clientes/:id', authController.obtenerClientes);
-router.delete('/proyectos/:id', authController.eliminarProyecto);
-
 module.exports = router;

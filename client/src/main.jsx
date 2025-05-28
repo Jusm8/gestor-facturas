@@ -20,16 +20,16 @@ if (rootElement) {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /></ProtectedRoute>} />
+            <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute> <Dashboard /> </ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
-            <Route path="/proyectos" element={<ProtectedRoute> <Proyectos /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
             <Route path="/proyectos/:id/crear/:tipo" element={<FormularioDocumento />} />
             <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento />} />
             <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
             <Route path="/factura/:id" element={<ProtectedRoute><DetalleFactura /></ProtectedRoute>} />
+            <Route path="/proyectos/:id/editar" element={<NuevoProyecto />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

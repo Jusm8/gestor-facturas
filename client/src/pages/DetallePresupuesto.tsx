@@ -10,77 +10,67 @@ export default function DetallePresupuesto() {
   const navigate = useNavigate();
 
   const handleDownloadPDF = () => {
-  const original = document.getElementById('presupuesto-pdf');
-  if (!original) return;
+    const original = document.getElementById('presupuesto-pdf');
+    if (!original) return;
 
-  // Clonar el contenido
-  const clone = original.cloneNode(true) as HTMLElement;
+    const clone = original.cloneNode(true) as HTMLElement;
 
-  // Inyectar los estilos directamente
-  const style = document.createElement('style');
-  style.innerHTML = `
+    // Inyectar estilos directamente
+    const style = document.createElement('style');
+    style.textContent = `
     body {
-      font-family: Arial, sans-serif;
-      color: #000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     h2 {
       color: #00a6e0;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-      margin-top: 1rem;
-    }
-
-    th {
-      background-color: #00a6e0;
-      color: white;
-      padding: 12px;
-      font-weight: bold;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-
-    td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ccc;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
     .info-top {
       display: flex;
       justify-content: space-between;
       margin-bottom: 1.5rem;
+      font-size: 1rem;
     }
-
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background-color: #00a6e0;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
     .totales {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       text-align: right;
       font-size: 1.1rem;
       font-weight: bold;
     }
   `;
-  clone.insertBefore(style, clone.firstChild);
+    clone.insertBefore(style, clone.firstChild);
 
-  // Generar PDF
-  html2pdf().set({
-    margin: 0.3,
-    filename: `presupuesto_${id}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-  }).from(clone).save();
-};
-
+    html2pdf().set({
+      margin: 0.3,
+      filename: `presupuesto_${id}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    }).from(clone).save();
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');

@@ -71,7 +71,7 @@ export default function ProyectoDetalle() {
 
             if (res.ok) {
                 await showSuccess('Eliminado', `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} eliminado correctamente`);
-                // Recarga la página o vuelve a cargar datos
+                //Recarga la página o vuelve a cargar los datos
                 window.location.reload();
             } else {
                 const data = await res.json();
@@ -83,46 +83,75 @@ export default function ProyectoDetalle() {
         }
 
     };
+    //Función para descargar el PDF
     const handleDescargarDocumento = async (tipo: 'factura' | 'presupuesto', idDoc: number) => {
         const token = localStorage.getItem('token');
+
         try {
             const res = await fetch(`http://localhost:3001/api/documento/${tipo}/${idDoc}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
 
             const container = document.createElement('div');
             container.style.padding = '2rem';
             container.style.fontFamily = 'Arial, sans-serif';
+
+            const isFactura = tipo === 'factura';
+
+            const baseImponible = data.detalles.reduce((acc: number, d: any) => acc + d.cantidad * d.precio_unitario, 0);
+            const iva = isFactura ? baseImponible * (parseFloat(data.iva) / 100) : 0;
+            const retencion = isFactura ? baseImponible * (parseFloat(data.retencion) / 100) : 0;
+            const totalFinal = baseImponible + iva - retencion;
+
             container.innerHTML = `
-            <h2 style="color: #0073e6; text-align: center;">SIMPLIFAC</h2>
-            <h3 style="text-align: center;">${tipo.toUpperCase()}</h3>
-            <p><strong>Cliente:</strong> ${data.cliente_nombre || ''}</p>
-            <p><strong>Fecha:</strong> ${new Date(data.fecha).toLocaleDateString()}</p>
-            <hr />
-            <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                <thead style="background: #0077cc; color: white;">
-                    <tr>
-                        <th>Descripción</th>
-                        <th>Cantidad</th>
-                        <th>Precio unitario</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
+                <h2 style="color: #00a6e0; text-align: center;">SIMPLIFAC</h2>
+                <h3 style="text-align: center;">${tipo.toUpperCase()}</h3>
+
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <div>
+                        <p><strong>Cliente:</strong> ${data.cliente_nombre}</p>
+                            ${isFactura ? `<p><strong>CIF/NIF:</strong> ${data.cliente_nif || ''}</p>` : ''}
+                    </div>
+                    <div>
+                        ${isFactura ? `<p><strong>Número de factura:</strong> ${data.idFactura || '-'}</p>` : ''}
+                        <p><strong>Fecha:</strong> ${new Date(data.fecha).toLocaleDateString()}</p>
+                    </div>
+                </div>
+
+                <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead style="background: #00a6e0; color: white;">
+                        <tr>
+                            <th>${isFactura ? 'Concepto' : 'Descripción'}</th>
+                            <th>${isFactura ? 'Cantidad x Base' : 'Cantidad'}</th>
+                            <th>Total</th>
+                            ${isFactura ? '<th>I.V.A</th>' : ''}
+                        </tr>
+                    </thead>
                 <tbody>
                     ${data.detalles.map((d: any) => `
                         <tr>
-                            <td>${d.descripcion || '-'}</td>
-                            <td>${d.cantidad}</td>
-                            <td>${parseFloat(d.precio_unitario).toFixed(2)}€</td>
+                            <td>${d.descripcion}</td>
+                            <td>${isFactura ? `${d.cantidad} x ${parseFloat(d.precio_unitario).toFixed(2)}€` : d.cantidad}</td>
                             <td>${(d.cantidad * d.precio_unitario).toFixed(2)}€</td>
+                            ${isFactura ? `<td>${data.iva || 0}%</td>` : ''}
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
-            <p style="text-align: right; margin-top: 1rem;"><strong>Total:</strong> ${parseFloat(data.total || 0).toFixed(2)}€</p> `;
+
+            <div style="text-align: right; margin-top: 1rem; font-size: 13px;">
+                ${isFactura ? `
+                    <p><strong>Base imponible:</strong> ${baseImponible.toFixed(2)}€</p>
+                    <p><strong>I.V.A:</strong> ${iva.toFixed(2)}€</p>
+                    <p><strong>Retención:</strong> -${retencion.toFixed(2)}€</p>
+                ` : ''}
+                    <p style="font-size: 16px; font-weight: bold; margin-top: 0.5rem;">
+                        TOTAL: <span style="color: #0077cc">${totalFinal.toFixed(2)}€</span>
+                    </p>
+            </div>
+            `;
+
             html2pdf().set({
                 margin: 0.5,
                 filename: `${tipo}_${idDoc}.pdf`,
@@ -135,6 +164,7 @@ export default function ProyectoDetalle() {
             showError('Error', 'No se pudo generar el PDF');
         }
     };
+
 
     return (
         <div className="detalle-container">

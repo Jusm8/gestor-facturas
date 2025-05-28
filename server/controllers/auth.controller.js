@@ -64,7 +64,8 @@ exports.login = async (req, res) => {
 };
 const cleanDate = (dateStr) => {
   if (!dateStr) return null;
-  return new Date(dateStr).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  //Tiempo en modo YYYY-MM-DD
+  return new Date(dateStr).toISOString().split('T')[0];
 };
 
 //Actualizar perfil
@@ -78,7 +79,7 @@ exports.updateProfile = async (req, res) => {
     localidad
   } = req.body;
 
-  // Si se sube una imagen, obtenemos la ruta generada por multer
+  //Si se sube una imagen, obtenemos la ruta generada por multer
   const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
 
   //test
@@ -362,5 +363,40 @@ exports.eliminarProyecto = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar el proyecto' });
   } finally {
     conn.release();
+  }
+};
+
+exports.obtenerProyectoById = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await pool.query('SELECT * FROM Proyecto WHERE idProyecto = ?', [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Proyecto no encontrado' });
+    }
+
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('Error al obtener el proyecto:', error);
+    res.status(500).json({ error: 'Error al obtener el proyecto' });
+  }
+};
+
+exports.editarProyecto = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, descripcion, fecha_inicio, fecha_fin, estado } = req.body;
+
+  try {
+    await pool.query(
+      `UPDATE Proyecto SET nombre = ?, descripcion = ?, fecha_inicio = ?, fecha_fin = ?, estado = ?
+       WHERE idProyecto = ?`,
+      [nombre, descripcion, fecha_inicio, fecha_fin, estado, id]
+    );
+
+    res.json({ message: 'Proyecto actualizado correctamente' });
+  } catch (error) {
+    console.error('Error al actualizar proyecto:', error);
+    res.status(500).json({ error: 'Error al actualizar el proyecto' });
   }
 };

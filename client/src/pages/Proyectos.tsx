@@ -14,7 +14,7 @@ export default function Proyectos() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/auth/proyectos/${user.id}`, {
+      const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -46,7 +46,7 @@ export default function Proyectos() {
   }, [busqueda, proyectosOriginales]);
 
   const handleEditar = (idProyecto: number) => {
-    navigate(`/proyectos/${idProyecto}`);
+    navigate(`/proyectos/${idProyecto}/editar`);
   };
 
   const handleEliminar = (idProyecto: number) => {
@@ -61,7 +61,8 @@ export default function Proyectos() {
       if (result.isConfirmed) {
         try {
           const token = localStorage.getItem('token');
-          const res = await fetch(`http://localhost:3001/api/auth/proyectos/${idProyecto}`, {
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,
