@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { showSuccess, showError } from '../components/alert';
 import '../assets/styles/FormularioDocumento.css';
 
@@ -9,64 +9,52 @@ function toYYYYMMDD(dateStr: string) {
 }
 
 export default function FormularioDocumento() {
-
-  const { id, tipo } = useParams<{ id?: string; tipo?: 'presupuesto' | 'factura' }>();
-  const { id: rawProyectoId } = useParams();
-  const idProyecto = !tipo ? rawProyectoId : undefined;
-
+  const { tipo, id, proyectoId } = useParams<{ tipo?: 'presupuesto' | 'factura'; id?: string; proyectoId?: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const [documentoTipo, setDocumentoTipo] = useState<'presupuesto' | 'factura'>(tipo || 'presupuesto');
   const modoEdicion = !!id;
 
-  const [formulario, setFormulario] = useState({
+  const [clientes, setClientes] = useState<any[]>([]);
+  const [formulario, setFormulario] = useState<any>({
     fecha: '',
     fecha_validez: '',
     total: '',
     estado: 'pendiente',
     cliente: '',
-    proyecto: '',
+    proyecto: proyectoId,
     forma_pago: '',
-    iva: tipo === 'factura' ? '21' : '',
-    retencion: tipo === 'factura' ? '0' : '',
+    iva: '21',
+    retencion: '0',
     detalles: [{ cantidad: '', descripcion: '', precio_unitario: '', producto: '' }]
   });
 
-  const [clientes, setClientes] = useState<{ idCliente: number, nombre: string, nif: string, email: string }[]>([]);
-
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    const fetchClientes = async () => {
-      try {
-        const res = await fetch(`http://localhost:3001/api/auth/clientes/${userData.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (res.ok) setClientes(data);
-      } catch (err) {
-        console.error("Error al conectar con el servidor", err);
-      }
-    };
+    fetch(`http://localhost:3001/api/auth/clientes/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(setClientes)
+      .catch(console.error);
 
-    const fetchDocumento = async () => {
-      if (!modoEdicion || !id) return;
-
-      try {
-        const res = await fetch(`http://localhost:3001/api/documento/${tipo}/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-
-        if (res.ok) {
+    if (modoEdicion && tipo && id) {
+      fetch(`http://localhost:3001/api/documento/${tipo}/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          setDocumentoTipo(tipo);
           setFormulario({
             fecha: data.fecha || '',
             fecha_validez: data.fecha_validez || '',
-            total: (data.total ?? data.detalles?.reduce(
-              (acc: number, d: any) => acc + (d.cantidad * d.precio_unitario), 0
-            )).toFixed(2),
+            total: data.total?.toFixed(2) || '',
             estado: data.estado || 'pendiente',
             cliente: data.Cliente_idCliente?.toString() || '',
-            proyecto: data.Proyecto_idProyecto?.toString() || idProyecto || '',
+            proyecto: data.Proyecto_idProyecto?.toString() || proyectoId,
             forma_pago: data.forma_pago || '',
             iva: data.iva?.toString() || '',
             retencion: data.retencion?.toString() || '',
@@ -77,73 +65,72 @@ export default function FormularioDocumento() {
               producto: d.Producto_idProducto?.toString() || ''
             })) || [{ cantidad: '', descripcion: '', precio_unitario: '', producto: '' }]
           });
-        }
-      } catch (error) {
-        console.error("Error al cargar documento:", error);
-      }
-    };
-
-    fetchClientes();
-    fetchDocumento();
-
-    if (!modoEdicion && idProyecto) {
-      setFormulario(prev => ({ ...prev, proyecto: idProyecto }));
+        })
+        .catch(console.error);
     }
-
-  }, [id, tipo, idProyecto, modoEdicion]);
+  }, [tipo, id, proyectoId, modoEdicion]);
 
   useEffect(() => {
-    const baseImponible = formulario.detalles.reduce((acc, item) => {
-      const cantidad = parseFloat(item.cantidad) || 0;
-      const precio = parseFloat(item.precio_unitario) || 0;
-      return acc + cantidad * precio;
-    }, 0);
+    const base = formulario.detalles.reduce((acc: number, d: any) =>
+      acc + (parseFloat(d.cantidad || 0) * parseFloat(d.precio_unitario || 0)), 0);
+    const iva = documentoTipo === 'factura' ? (parseFloat(formulario.iva || '0') / 100) : 0;
+    const ret = documentoTipo === 'factura' ? (parseFloat(formulario.retencion || '0') / 100) : 0;
+    const total = base + base * iva - base * ret;
 
-    const iva = tipo === 'factura' ? (parseFloat(formulario.iva || '0') / 100) : 0;
-    const retencion = tipo === 'factura' ? (parseFloat(formulario.retencion || '0') / 100) : 0;
-
-    const totalCalculado = baseImponible + (baseImponible * iva) - (baseImponible * retencion);
-
-    setFormulario(prev => ({
-      ...prev,
-      total: totalCalculado.toFixed(2)
-    }));
-  }, [formulario.detalles, formulario.iva, formulario.retencion, tipo]);
+    setFormulario((f: any) => ({ ...f, total: total.toFixed(2) }));
+  }, [formulario.detalles, formulario.iva, formulario.retencion, documentoTipo]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
   const handleDetalleChange = (index: number, field: string, value: any) => {
-    const nuevosDetalles = [...formulario.detalles];
-    nuevosDetalles[index][field] = value;
-    setFormulario({ ...formulario, detalles: nuevosDetalles });
+    const nuevos = [...formulario.detalles];
+    nuevos[index][field] = value;
+    setFormulario({ ...formulario, detalles: nuevos });
+  };
+
+  const handleTipoSeleccion = (tipoSel: 'presupuesto' | 'factura') => {
+    setDocumentoTipo(tipoSel);
+    setFormulario(prev => ({
+      ...prev,
+      iva: tipoSel === 'factura' ? '21' : '',
+      retencion: tipoSel === 'factura' ? '0' : '',
+      fecha_validez: tipoSel === 'presupuesto' ? prev.fecha_validez : ''
+    }));
   };
 
   const agregarProducto = () => {
-    setFormulario({
-      ...formulario,
-      detalles: [...formulario.detalles, { cantidad: '', descripcion: '', precio_unitario: '', producto: '' }]
-    });
+    setFormulario(prev => ({
+      ...prev,
+      detalles: [...prev.detalles, { cantidad: '', descripcion: '', precio_unitario: '', producto: '' }]
+    }));
   };
 
   const eliminarProducto = (index: number) => {
-    //No borrar si hay menos de 1 producto
     if (formulario.detalles.length <= 1) return;
-    const nuevosDetalles = formulario.detalles.filter((_, i) => i !== index);
-    setFormulario({ ...formulario, detalles: nuevosDetalles });
+    const nuevos = formulario.detalles.filter((_, i) => i !== index);
+    setFormulario({ ...formulario, detalles: nuevos });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const token = localStorage.getItem('token');
-    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    const Proyecto_idProyecto = formulario.proyecto || idProyecto;
+    // Validaciones importantes
+    if (!formulario.cliente) {
+      showError('Error', 'Debes seleccionar un cliente.');
+      return;
+    }
 
-    if (!Proyecto_idProyecto) {
-      showError('Error', 'Falta el proyecto. No se puede enviar el formulario.');
+    if (!formulario.proyecto) {
+      showError('Error', 'No se ha definido el proyecto. Asegúrate de acceder desde un proyecto.');
+      return;
+    }
+
+    if (!formulario.detalles || formulario.detalles.length === 0) {
+      showError('Error', 'Agrega al menos un producto al detalle.');
       return;
     }
 
@@ -151,34 +138,36 @@ export default function FormularioDocumento() {
       fecha: formulario.fecha,
       forma_pago: formulario.forma_pago,
       estado: formulario.estado,
-      Usuario_idUsuario: userData.id,
+      Usuario_idUsuario: user.id,
       Cliente_idCliente: parseInt(formulario.cliente),
-      Proyecto_idProyecto: parseInt(Proyecto_idProyecto),
-      detalles: formulario.detalles.map(d => ({
-        cantidad: d.cantidad,
+      Proyecto_idProyecto: parseInt(formulario.proyecto),
+      detalles: formulario.detalles.map((d: any) => ({
+        cantidad: parseFloat(d.cantidad),
         descripcion: d.descripcion,
-        precio_unitario: d.precio_unitario,
+        precio_unitario: parseFloat(d.precio_unitario),
         Producto_idProducto: parseInt(d.producto)
       }))
     };
 
-    if (tipo === 'presupuesto') {
-      payload.fecha_validez = formulario.fecha_validez;
-    }
-
-    if (tipo === 'factura') {
+    if (documentoTipo === 'factura') {
       payload.iva = parseFloat(formulario.iva);
       payload.retencion = parseFloat(formulario.retencion);
     }
 
-    try {
-      const method = modoEdicion ? 'PUT' : 'POST';
-      const url = modoEdicion
-        ? `http://localhost:3001/api/documento/${tipo}/${id}`
-        : `http://localhost:3001/api/documento/${tipo}`;
+    if (documentoTipo === 'presupuesto') {
+      payload.fecha_validez = formulario.fecha_validez;
+    }
 
+    // Depuración
+    console.log('Payload que se enviará:', payload);
+
+    const url = modoEdicion
+      ? `http://localhost:3001/api/documento/${documentoTipo}/${id}`
+      : `http://localhost:3001/api/documento/${documentoTipo}`;
+
+    try {
       const res = await fetch(url, {
-        method,
+        method: modoEdicion ? 'PUT' : 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -186,49 +175,63 @@ export default function FormularioDocumento() {
         body: JSON.stringify(payload)
       });
 
-      const result = await res.json();
+      const data = await res.json();
 
       if (res.ok) {
-        await showSuccess('Éxito', `${tipo === 'factura' ? 'Factura' : 'Presupuesto'} creado correctamente`);
+        await showSuccess('Éxito', `Documento ${modoEdicion ? 'actualizado' : 'creado'} correctamente`);
         navigate(`/proyectos/${formulario.proyecto}`);
       } else {
-        showError('Error', result.error || `Error al crear ${tipo}`);
+        console.error('Respuesta con error del backend:', data);
+        showError('Error', data.error || 'Error en la operación');
       }
-
     } catch (err) {
-      console.error(err);
-      showError('Error', 'Error de conexión con el servidor');
+      console.error('Error de red:', err);
+      showError('Error', 'No se pudo conectar con el servidor');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>
-        {modoEdicion
-          ? tipo === 'presupuesto' ? 'Editar Presupuesto' : 'Editar Factura'
-          : tipo === 'presupuesto' ? 'Nuevo Presupuesto' : 'Nueva Factura'}
-      </h3>
+      {!modoEdicion && (
+        <div className="slider-toggle">
+          <button
+            type="button"
+            className={documentoTipo === 'presupuesto' ? 'active' : ''}
+            onClick={() => handleTipoSeleccion('presupuesto')}
+          >
+            Presupuesto
+          </button>
+          <button
+            type="button"
+            className={documentoTipo === 'factura' ? 'active' : ''}
+            onClick={() => handleTipoSeleccion('factura')}
+          >
+            Factura
+          </button>
+        </div>
+      )}
+
+      <h3>{modoEdicion ? `Editar ${documentoTipo}` : `Nuevo ${documentoTipo}`}</h3>
 
       <label>Fecha:</label>
-      <input type="date" name="fecha" value={toYYYYMMDD(formulario.fecha)} onChange={handleChange} required />
+      <input type="text" name="fecha" value={toYYYYMMDD(formulario.fecha)} onChange={handleChange} required />
 
       <label>Forma de pago:</label>
       <input name="forma_pago" value={formulario.forma_pago} onChange={handleChange} required />
 
-      {tipo === 'presupuesto' && (
+      {documentoTipo === 'presupuesto' && (
         <>
-          <label>Validez del presupuesto hasta:</label>
+          <label>Validez hasta:</label>
           <input type="date" name="fecha_validez" value={toYYYYMMDD(formulario.fecha_validez)} onChange={handleChange} />
         </>
       )}
 
-      {tipo === 'factura' && (
+      {documentoTipo === 'factura' && (
         <>
           <label>IVA (%):</label>
-          <input type="number" name="iva" value={formulario.iva} onChange={handleChange} placeholder="21" />
-
-          <label>Retención IRPF (%):</label>
-          <input type="number" name="retencion" value={formulario.retencion} onChange={handleChange} placeholder="0" />
+          <input type="number" name="iva" value={formulario.iva} onChange={handleChange} />
+          <label>Retención (%):</label>
+          <input type="number" name="retencion" value={formulario.retencion} onChange={handleChange} />
         </>
       )}
 
@@ -239,58 +242,35 @@ export default function FormularioDocumento() {
       </select>
 
       <label>Cliente:</label>
-      <select name="cliente" value={formulario.cliente} onChange={handleChange} required>
+      <select name="cliente" value={formulario.cliente} onChange={handleChange}>
         <option value="">Seleccione un cliente</option>
-        {clientes.map(cliente => (
-          <option key={cliente.idCliente} value={cliente.idCliente}>
-            {cliente.nombre} - {cliente.nif} ({cliente.email})
-          </option>
+        {clientes.map(c => (
+          <option key={c.idCliente} value={c.idCliente}>{c.nombre}</option>
         ))}
       </select>
 
-      <h4>Detalles:</h4>
-      {formulario.detalles.map((detalle, i) => (
+      <h4>Detalles</h4>
+      {formulario.detalles.map((d: any, i: number) => (
         <div key={i} className="detalle-item">
           <div className="detalle-inputs">
-
-            <input
-              placeholder="Descripción"
-              value={detalle.descripcion}
-              onChange={(e) => handleDetalleChange(i, 'descripcion', e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Cantidad"
-              value={detalle.cantidad}
-              onChange={(e) => handleDetalleChange(i, 'cantidad', parseFloat(e.target.value))}
-            />
-            <input
-              type="number"
-              placeholder="Precio unitario"
-              value={detalle.precio_unitario}
-              onChange={(e) => handleDetalleChange(i, 'precio_unitario', parseFloat(e.target.value))}
-            />
-            <input
-              placeholder="ID Producto"
-              value={detalle.producto}
-              onChange={(e) => handleDetalleChange(i, 'producto', e.target.value)}
-            />
+            <input placeholder="Descripción" value={d.descripcion} onChange={e => handleDetalleChange(i, 'descripcion', e.target.value)} />
+            <input type="number" placeholder="Cantidad" value={d.cantidad} onChange={e => handleDetalleChange(i, 'cantidad', e.target.value)} />
+            <input type="number" placeholder="Precio" value={d.precio_unitario} onChange={e => handleDetalleChange(i, 'precio_unitario', e.target.value)} />
+            <input placeholder="ID Producto" value={d.producto} onChange={e => handleDetalleChange(i, 'producto', e.target.value)} />
           </div>
-
           {formulario.detalles.length > 1 && (
-            <button type="button" className='btn-eliminar' onClick={() => eliminarProducto(i)}> 🗑️ </button>
+            <button type="button" className="btn-eliminar" onClick={() => eliminarProducto(i)}>🗑️</button>
           )}
         </div>
       ))}
 
       <label>Total:</label>
-      <input type="number" name="total" value={formulario.total} readOnly />
+      <input type="number" value={formulario.total} readOnly />
 
       <div className="button-group">
         <button type="button" onClick={agregarProducto}>+ Añadir Producto</button>
         <button type="submit">Guardar</button>
-        <button type="button" onClick={() => navigate(`/proyectos/${formulario.proyecto}`)}> Cancelar </button>
-
+        <button type="button" onClick={() => navigate(`/proyectos/${formulario.proyecto}`)}>Cancelar</button>
       </div>
     </form>
   );

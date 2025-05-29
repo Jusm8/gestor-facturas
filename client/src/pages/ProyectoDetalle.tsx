@@ -8,6 +8,7 @@ import html2pdf from 'html2pdf.js';
 export default function ProyectoDetalle() {
     const { id } = useParams();
     const navigate = useNavigate();
+
     interface Presupuesto {
         idPresupuesto: number;
         cliente: string;
@@ -26,6 +27,8 @@ export default function ProyectoDetalle() {
     const [facturas, setFacturas] = useState<Factura[]>([]);
 
     const [loading, setLoading] = useState(true);
+
+    const [filtros, setFiltros] = useState({ cliente: '', fecha: '', tipo: '' });
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -52,9 +55,32 @@ export default function ProyectoDetalle() {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, [id]);
+
+    const aplicarFiltros = () => {
+        const lowerCliente = filtros.cliente.toLowerCase();
+        const tipo = filtros.tipo;
+        const fechaFiltro = filtros.fecha.trim();
+
+        const filtrarLista = (lista: any[], tipoDoc: string) =>
+            lista.filter(item => {
+                const clienteCoincide = !lowerCliente || item.cliente.toLowerCase().includes(lowerCliente);
+
+                //Formato YYYY-MM-DD
+                const fechaDocStr = item.fecha?.slice(0, 10);
+
+                const fechaCoincide = !fechaFiltro || fechaDocStr.includes(fechaFiltro);
+                const tipoCoincide = !tipo || tipo === tipoDoc;
+
+                return clienteCoincide && fechaCoincide && tipoCoincide;
+            });
+
+        return {
+            presupuestos: filtrarLista(presupuestos, 'presupuesto'),
+            facturas: filtrarLista(facturas, 'factura'),
+        };
+    };
 
     const handleEliminar = async (tipo: 'factura' | 'presupuesto', id: number) => {
         const token = localStorage.getItem('token');
@@ -165,6 +191,11 @@ export default function ProyectoDetalle() {
         }
     };
 
+    const { presupuestos: presupuestosFiltrados, facturas: facturasFiltradas } = aplicarFiltros();
+    const documentosFiltrados = [
+        ...presupuestosFiltrados.map(p => ({ ...p, tipo: 'presupuesto' })),
+        ...facturasFiltradas.map(f => ({ ...f, tipo: 'factura' }))
+    ];
 
     return (
         <div className="detalle-container">
@@ -172,19 +203,53 @@ export default function ProyectoDetalle() {
                 ← Volver a Proyectos
             </button>
 
-            <h2>Listado de Facturas y Presupuestos</h2>
+            <h2 style={{ color: '#204080', fontWeight: '700', fontSize: '1.8rem', textAlign: 'center' }}>
+                Listado de Facturas y Presupuestos
+            </h2>
+
+            <div className="filtros-container" style={{ justifyContent: 'flex-start' }}>
+                <input
+                    type="text"
+                    placeholder="Filtrar por cliente"
+                    value={filtros.cliente}
+                    onChange={(e) => setFiltros({ ...filtros, cliente: e.target.value })}
+                />
+                <input
+                    type="text"
+                    placeholder="YYYY-MM-DD"
+                    title='Filtrar por fecha'
+                    value={filtros.fecha}
+                    onChange={(e) => setFiltros({ ...filtros, fecha: e.target.value })}
+                    className='filtro-fecha'
+                />
+                <select
+                    value={filtros.tipo}
+                    onChange={(e) => setFiltros({ ...filtros, tipo: e.target.value })}
+                >
+                    <option value="">Todos</option>
+                    <option value="presupuesto">Presupuesto</option>
+                    <option value="factura">Factura</option>
+                </select>
+                <button
+                    className="btn-limpiar"
+                    onClick={() => setFiltros({ cliente: '', fecha: '', tipo: '' })}
+                >
+                    Limpiar filtros
+                </button>
+            </div>
+
             <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
                 <button
                     className="crear-btn"
-                    onClick={() => navigate(`/proyectos/${id}/crear`)}
+                    onClick={() => navigate(`/proyectos/${id}/crear?tipo=presupuesto`)}
                 >
                     + Nuevo Documento
                 </button>
             </div>
             {loading ? (
                 <p>Cargando...</p>
-            ) : presupuestos.length === 0 && facturas.length === 0 ? (
-                <p className="empty">Sin presupuestos o facturas.</p>
+            ) : documentosFiltrados.length == 0 ? (
+                <p className="empty">Sin coincidencias.</p>
             ) : (
                 <table>
                     <thead>
@@ -198,36 +263,19 @@ export default function ProyectoDetalle() {
                         </tr>
                     </thead>
                     <tbody>
-                        {presupuestos.map((p, i) => (
-                            <tr key={`presupuesto-${p.idPresupuesto}-${p.fecha}-${i}`}>
-                                <td>{p.cliente}</td>
-                                <td>{new Date(p.fecha).toLocaleDateString('es-ES')}</td>
-                                <td>Presupuesto</td>
-                                <td>{p.descripcion || 'N/A'}</td>
+                        {documentosFiltrados.map((doc, idx) => (
+                            <tr key={`${doc.tipo}-${doc.idPresupuesto || doc.idFactura}-${idx}`}>
+                                <td>{doc.cliente}</td>
+                                <td>{new Date(doc.fecha).toLocaleDateString('es-ES')}</td>
+                                <td>{doc.tipo === 'factura' ? 'Factura' : 'Presupuesto'}</td>
+                                <td>{doc.descripcion || 'N/A'}</td>
                                 <td>
-                                    <button onClick={() => navigate(`/presupuesto/${p.idPresupuesto}/detalle`)}>👁</button>
+                                    <button onClick={() => navigate(`/${doc.tipo}/${doc.tipo === 'factura' ? doc.idFactura : doc.idPresupuesto}/detalle`)}>👁</button>
                                 </td>
                                 <td>
-                                    <button onClick={() => navigate(`/documento/presupuesto/editar/${p.idPresupuesto}`)}>✏️</button>
-                                    <button onClick={() => handleEliminar('presupuesto', p.idPresupuesto)}>🗑️</button>
-                                    <button onClick={() => handleDescargarDocumento('presupuesto', p.idPresupuesto)}>⬇️</button>
-                                </td>
-
-                            </tr>
-                        ))}
-                        {facturas.map((f, i) => (
-                            <tr key={`factura-${f.idFactura}-${f.fecha}-${i}`}>
-                                <td>{f.cliente}</td>
-                                <td>{new Date(f.fecha).toLocaleDateString('es-ES')}</td>
-                                <td>Factura</td>
-                                <td>{f.descripcion || 'N/A'}</td>
-                                <td>
-                                    <button onClick={() => navigate(`/factura/${f.idFactura}`)}>👁</button>
-                                </td>
-                                <td>
-                                    <button onClick={() => navigate(`/documento/factura/editar/${f.idFactura}`)}>✏️</button>
-                                    <button onClick={() => handleEliminar('factura', f.idFactura)}>🗑️</button>
-                                    <button onClick={() => handleDescargarDocumento('factura', f.idFactura)}>⬇️</button>
+                                    <button onClick={() => navigate(`/documento/${doc.tipo}/editar/${doc.idFactura || doc.idPresupuesto}`)}>✏️</button>
+                                    <button onClick={() => handleEliminar(doc.tipo, doc.idFactura || doc.idPresupuesto)}>🗑️</button>
+                                    <button onClick={() => handleDescargarDocumento(doc.tipo, doc.idFactura || doc.idPresupuesto)}>⬇️</button>
                                 </td>
                             </tr>
                         ))}

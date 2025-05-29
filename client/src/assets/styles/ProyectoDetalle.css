@@ -18,7 +18,8 @@ thead {
   background-color: #f1f1f1;
 }
 
-th, td {
+th,
+td {
   text-align: left;
   padding: 0.75rem;
   border-bottom: 1px solid #ddd;
@@ -32,16 +33,22 @@ th, td {
 }
 
 .crear-btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 8px 16px;
+  background-color: #4CAF50 !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
+  font-size: 14px;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .crear-btn:hover {
-  background-color: #45a049;
+  background-color: #43a047;
+  transform: translateY(-1px);
 }
 
 .btn-volver {
@@ -64,3 +71,99 @@ th, td {
   color: #096dd9;
   transform: translateX(-2px);
 }
+
+.filtros-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filtros-container input,
+.filtros-container select {
+  padding: 0.5rem;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  min-width: 180px;
+}
+
+.filtros-container input:focus,
+.filtros-container select:focus {
+  outline: none;
+  border-color: #00a6e0;
+  box-shadow: 0 0 3px #00a6e0;
+}
+
+.detalle-container table {
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.detalle-container th,
+.detalle-container td {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.detalle-container th {
+  background-color: #f5faff;
+  color: #004b8d;
+  font-weight: 600;
+}
+
+.detalle-container button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px;
+  transition: transform 0.2s;
+}
+
+.detalle-container button:hover {
+  transform: scale(1.1);
+}
+
+.filtros-container input[type="text"],
+.filtros-container input[type="date"],
+.filtros-container select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filtros-container input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+  cursor: pointer;
+}
+
+.filtros-container input:focus,
+.filtros-container select:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.btn-limpiar {
+  background-color: #f5222d !important; 
+  color: white !important;
+  visibility: visible !important;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+

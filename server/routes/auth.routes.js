@@ -26,11 +26,11 @@ router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
 
 //Proyectos
-router.post('/proyecto', authController.crearProyecto);                          // Crear proyecto
-router.get('/proyectos/usuario/:idUsuario', authController.obtenerProyectosPorUsuario); // Listar proyectos de usuario
-router.get('/proyectos/:id/editar', authController.obtenerProyectoById);        // Obtener datos para editar
-router.put('/proyectos/:id', authController.editarProyecto);                    // Actualizar
-router.delete('/proyectos/:id', authController.eliminarProyecto);               // Eliminar
+router.post('/proyecto', authController.crearProyecto);
+router.get('/proyectos/usuario/:idUsuario', authController.obtenerProyectosPorUsuario);
+router.get('/proyectos/:id/editar', authController.obtenerProyectoById);
+router.put('/proyectos/:id', authController.editarProyecto);
+router.delete('/proyectos/:id', authController.eliminarProyecto);
 
 //Presupuestos y Clientes
 router.post('/presupuestos', authController.crearPresupuesto);

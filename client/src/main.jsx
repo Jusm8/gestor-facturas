@@ -25,11 +25,11 @@ if (rootElement) {
             <Route path="/perfil" element={<ProtectedRoute> <Profile /> </ProtectedRoute>} />
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
-            <Route path="/proyectos/:id/crear/:tipo" element={<FormularioDocumento />} />
-            <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento />} />
             <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
             <Route path="/factura/:id" element={<ProtectedRoute><DetalleFactura /></ProtectedRoute>} />
             <Route path="/proyectos/:id/editar" element={<NuevoProyecto />} />
+            <Route path="/proyectos/:proyectoId/crear" element={<FormularioDocumento />} />
+            <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

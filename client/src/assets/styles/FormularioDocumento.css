@@ -184,3 +184,29 @@ input[readonly] {
 .btn-eliminar:hover {
   background-color: #b02a37;
 }
+
+.tipo-selector {
+  margin-bottom: 1.5rem;
+  display: flex;
+  gap: 10px;
+}
+
+.tipo-selector button {
+  background-color: #f0f0f0;
+  border: 1px solid #bbb;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tipo-selector button:hover {
+  background-color: #e2e2e2;
+}
+
+.tipo-selector .activo {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
