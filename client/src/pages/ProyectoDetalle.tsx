@@ -241,7 +241,7 @@ export default function ProyectoDetalle() {
             <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
                 <button
                     className="crear-btn"
-                    onClick={() => navigate(`/proyectos/${id}/crear?tipo=presupuesto`)}
+                    onClick={() => navigate(`/proyectos/${id}/crear?tipo=presupuesto&proyecto=${id}`)}
                 >
                     + Nuevo Documento
                 </button>

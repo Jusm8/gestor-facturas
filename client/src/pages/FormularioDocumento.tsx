@@ -5,13 +5,17 @@ import '../assets/styles/FormularioDocumento.css';
 
 function toYYYYMMDD(dateStr: string) {
   if (!dateStr) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
   return new Date(dateStr).toISOString().split('T')[0];
 }
 
 export default function FormularioDocumento() {
-  const { tipo, id, proyectoId } = useParams<{ tipo?: 'presupuesto' | 'factura'; id?: string; proyectoId?: string }>();
+  const { tipo, id } = useParams<{ tipo?: 'presupuesto' | 'factura'; id?: string }>();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const searchParams = new URLSearchParams(location.search);
+  const proyectoId = searchParams.get('proyecto') || '';
 
   const [documentoTipo, setDocumentoTipo] = useState<'presupuesto' | 'factura'>(tipo || 'presupuesto');
   const modoEdicion = !!id;
@@ -51,7 +55,7 @@ export default function FormularioDocumento() {
           setFormulario({
             fecha: data.fecha || '',
             fecha_validez: data.fecha_validez || '',
-            total: data.total?.toFixed(2) || '',
+            total: data.total ? Number(data.total).toFixed(2) : '',
             estado: data.estado || 'pendiente',
             cliente: data.Cliente_idCliente?.toString() || '',
             proyecto: data.Proyecto_idProyecto?.toString() || proyectoId,
@@ -118,7 +122,7 @@ export default function FormularioDocumento() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // Validaciones importantes
+    // Validacionespara evitar errores
     if (!formulario.cliente) {
       showError('Error', 'Debes seleccionar un cliente.');
       return;
@@ -131,6 +135,15 @@ export default function FormularioDocumento() {
 
     if (!formulario.detalles || formulario.detalles.length === 0) {
       showError('Error', 'Agrega al menos un producto al detalle.');
+      return;
+    }
+
+    const detallesValidos = formulario.detalles.every((d: any) =>
+      d.descripcion && d.cantidad && d.precio_unitario && d.producto
+    );
+
+    if (!detallesValidos) {
+      showError('Error', 'Completa todos los campos de los productos antes de guardar.');
       return;
     }
 
@@ -214,7 +227,7 @@ export default function FormularioDocumento() {
       <h3>{modoEdicion ? `Editar ${documentoTipo}` : `Nuevo ${documentoTipo}`}</h3>
 
       <label>Fecha:</label>
-      <input type="text" name="fecha" value={toYYYYMMDD(formulario.fecha)} onChange={handleChange} required />
+      <input type="text" name="fecha" placeholder="YYYY-MM-DD" value={toYYYYMMDD(formulario.fecha)} onChange={handleChange} required />
 
       <label>Forma de pago:</label>
       <input name="forma_pago" value={formulario.forma_pago} onChange={handleChange} required />
@@ -270,7 +283,7 @@ export default function FormularioDocumento() {
       <div className="button-group">
         <button type="button" onClick={agregarProducto}>+ Añadir Producto</button>
         <button type="submit">Guardar</button>
-        <button type="button" onClick={() => navigate(`/proyectos/${formulario.proyecto}`)}>Cancelar</button>
+       <button type="button" onClick={() => navigate(`/proyectos/${proyectoId || formulario.proyecto}`)}>Cancelar</button>
       </div>
     </form>
   );

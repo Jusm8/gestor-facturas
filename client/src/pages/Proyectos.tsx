@@ -101,7 +101,7 @@ export default function Proyectos() {
       ) : (
         <div className="proyecto-lista">
           {proyectos.map((proy) => (
-            <div className="proyecto-card" key={proy.idProyecto} onClick={() => navigate(`/proyectos/${proy.idProyecto}`)}>
+            <div className="proyecto-card" key={proy.idProyecto}onClick={() => navigate(`/proyectos/${proy.idProyecto}`)}>
               <div className="proyecto-header">
                 <h3>{proy.nombre}</h3>
                 <div className="proyecto-actions">

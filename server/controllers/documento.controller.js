@@ -357,10 +357,13 @@ exports.editarFactura = async (req, res) => {
       (baseImponible * (iva / 100)) -
       (baseImponible * (retencion / 100));
 
+    const fechaSQL = new Date(fecha).toISOString().split('T')[0];
+    const fechaValidezSQL = fecha_validez ? new Date(fecha_validez).toISOString().split('T')[0] : null;
+
     await conn.query(
       `UPDATE Factura SET fecha = ?, fecha_validez = ?, forma_pago = ?, estado = ?, Cliente_idCliente = ?, Proyecto_idProyecto = ?, iva = ?, retencion = ?, total = ?
-       WHERE idFactura = ?`,
-      [fecha, fecha_validez || null, forma_pago, estado, Cliente_idCliente, Proyecto_idProyecto, iva, retencion, total, id]
+   WHERE idFactura = ?`,
+      [fechaSQL, fechaValidezSQL, forma_pago, estado, Cliente_idCliente, Proyecto_idProyecto, iva, retencion, total, id]
     );
 
     await conn.query('DELETE FROM FacturaDetalle WHERE Factura_idFactura = ?', [id]);
