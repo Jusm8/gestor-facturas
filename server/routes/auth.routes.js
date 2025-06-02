@@ -35,4 +35,8 @@ router.delete('/proyectos/:id', authController.eliminarProyecto);
 //Presupuestos y Clientes
 router.post('/presupuestos', authController.crearPresupuesto);
 router.get('/clientes/:id', authController.obtenerClientes);
+
+//Productos
+router.get('/productos/:id', authController.obtenerProductosPorUsuario);
+
 module.exports = router;

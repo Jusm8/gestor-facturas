@@ -31,7 +31,7 @@ export default function Login() {
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);
                 showSuccess('Logeo okey', "Login exitoso").then(() => {
-                    window.location.href = '/dashboard';
+                    window.location.href = '/proyectos';
                 });
             } else {
                 showError(data.error || 'Error en el login');

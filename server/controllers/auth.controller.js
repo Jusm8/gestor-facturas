@@ -400,3 +400,19 @@ exports.editarProyecto = async (req, res) => {
     res.status(500).json({ error: 'Error al actualizar el proyecto' });
   }
 };
+
+exports.obtenerProductosPorUsuario = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [productos] = await pool.query(
+      'SELECT idProducto, nombre, tipo, precio, descripcion FROM Producto WHERE Usuario_idUsuario = ?',
+      [id]
+    );
+
+    res.json(productos);
+  } catch (error) {
+    console.error('Error al obtener productos:', error);
+    res.status(500).json({ error: 'Error al obtener productos' });
+  }
+};

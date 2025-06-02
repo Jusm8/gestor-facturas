@@ -84,7 +84,9 @@ export default function Proyectos() {
   };
 
   return (
-    <div className="proyectos-container">
+    <div className="proyectos-container" style={{ background: 'linear-gradient(to bottom, #4760c0, #17224d)', minHeight: '100vh' }}>
+      <h1 className="proyectos-titulo-principal">¿Qué proyecto deseas gestionar hoy?</h1>
+
       <div className="proyectos-header">
         <input
           type="text"
@@ -99,39 +101,18 @@ export default function Proyectos() {
       {proyectos.length === 0 ? (
         <p className="no-proyectos">No hay proyectos que coincidan con la búsqueda.</p>
       ) : (
-        <div className="proyecto-lista">
+        <div className="dashboard-grid">
           {proyectos.map((proy) => (
-            <div className="proyecto-card" key={proy.idProyecto}onClick={() => navigate(`/proyectos/${proy.idProyecto}`)}>
-              <div className="proyecto-header">
-                <h3>{proy.nombre}</h3>
-                <div className="proyecto-actions">
-                  <button
-                    className="btn-icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditar(proy.idProyecto);
-                    }}
-                    title="Editar proyecto"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    className="btn-icon"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEliminar(proy.idProyecto);
-                    }}
-                    title="Eliminar proyecto"
-                  >
-                    🗑️
-                  </button>
-
-                </div>
-              </div>
+            <div className="dashboard-card" key={proy.idProyecto} onClick={() => navigate(`/dashboard/${proy.idProyecto}`)}>
+              <h3>{proy.nombre}</h3>
               <p><strong>Estado:</strong> {proy.estado}</p>
               <p>{proy.descripcion}</p>
               <p><strong>Inicio:</strong> {new Date(proy.fecha_inicio).toLocaleDateString()}</p>
               <p><strong>Fin:</strong> {new Date(proy.fecha_fin).toLocaleDateString()}</p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '0.5rem' }}>
+                <button className="btn-icon" onClick={(e) => { e.stopPropagation(); handleEditar(proy.idProyecto); }} title="Editar">✏️</button>
+                <button className="btn-icon" onClick={(e) => { e.stopPropagation(); handleEliminar(proy.idProyecto); }} title="Eliminar">🗑️</button>
+              </div>
             </div>
           ))}
         </div>
