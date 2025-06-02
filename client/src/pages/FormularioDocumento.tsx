@@ -6,7 +6,11 @@ import '../assets/styles/FormularioDocumento.css';
 function toYYYYMMDD(dateStr: string) {
   if (!dateStr) return '';
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
-  return new Date(dateStr).toISOString().split('T')[0];
+
+  const parsedDate = new Date(dateStr);
+  if (isNaN(parsedDate.getTime())) return '';
+
+  return parsedDate.toISOString().split('T')[0];
 }
 
 export default function FormularioDocumento() {
@@ -122,7 +126,7 @@ export default function FormularioDocumento() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // Validacionespara evitar errores
+    //Validacionespara evitar errores
     if (!formulario.cliente) {
       showError('Error', 'Debes seleccionar un cliente.');
       return;
@@ -170,9 +174,6 @@ export default function FormularioDocumento() {
     if (documentoTipo === 'presupuesto') {
       payload.fecha_validez = formulario.fecha_validez;
     }
-
-    // Depuración
-    console.log('Payload que se enviará:', payload);
 
     const url = modoEdicion
       ? `http://localhost:3001/api/documento/${documentoTipo}/${id}`
@@ -227,7 +228,13 @@ export default function FormularioDocumento() {
       <h3>{modoEdicion ? `Editar ${documentoTipo}` : `Nuevo ${documentoTipo}`}</h3>
 
       <label>Fecha:</label>
-      <input type="text" name="fecha" placeholder="YYYY-MM-DD" value={toYYYYMMDD(formulario.fecha)} onChange={handleChange} required />
+      <input
+        type="date"
+        name="fecha"
+        value={/^\d{4}-\d{2}-\d{2}$/.test(formulario.fecha) ? formulario.fecha : ''}
+        onChange={handleChange}
+        required
+      />
 
       <label>Forma de pago:</label>
       <input name="forma_pago" value={formulario.forma_pago} onChange={handleChange} required />
@@ -283,7 +290,7 @@ export default function FormularioDocumento() {
       <div className="button-group">
         <button type="button" onClick={agregarProducto}>+ Añadir Producto</button>
         <button type="submit">Guardar</button>
-       <button type="button" onClick={() => navigate(`/proyectos/${proyectoId || formulario.proyecto}`)}>Cancelar</button>
+        <button type="button" onClick={() => navigate(`/proyectos/${proyectoId || formulario.proyecto}`)}>Cancelar</button>
       </div>
     </form>
   );

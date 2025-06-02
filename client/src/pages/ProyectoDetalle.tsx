@@ -67,8 +67,8 @@ export default function ProyectoDetalle() {
             lista.filter(item => {
                 const clienteCoincide = !lowerCliente || item.cliente.toLowerCase().includes(lowerCliente);
 
-                //Formato YYYY-MM-DD
-                const fechaDocStr = item.fecha?.slice(0, 10);
+                const fechaObj = new Date(item.fecha);
+                const fechaDocStr = `${fechaObj.getFullYear()}-${(fechaObj.getMonth() + 1).toString().padStart(2, '0')}-${fechaObj.getDate().toString().padStart(2, '0')}`;
 
                 const fechaCoincide = !fechaFiltro || fechaDocStr.includes(fechaFiltro);
                 const tipoCoincide = !tipo || tipo === tipoDoc;
@@ -215,12 +215,11 @@ export default function ProyectoDetalle() {
                     onChange={(e) => setFiltros({ ...filtros, cliente: e.target.value })}
                 />
                 <input
-                    type="text"
-                    placeholder="YYYY-MM-DD"
-                    title='Filtrar por fecha'
+                    type="date"
+                    title="Filtrar por fecha"
                     value={filtros.fecha}
                     onChange={(e) => setFiltros({ ...filtros, fecha: e.target.value })}
-                    className='filtro-fecha'
+                    className="filtro-fecha"
                 />
                 <select
                     value={filtros.tipo}
