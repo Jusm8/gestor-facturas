@@ -5,12 +5,15 @@ const gestionController = require('../controllers/gestion.controller');
 // CLIENTES
 router.get('/clientes/usuario/:idUsuario', gestionController.obtenerClientes);
 router.post('/clientes', gestionController.crearCliente);
-router.get('/clientes/:id', gestionController.obtenerClienteById); // lectura individual
-router.put('/clientes/:id', gestionController.actualizarCliente);  // edición
-router.delete('/clientes/:id', gestionController.eliminarCliente); // ESTA RUTA FALTABA
+router.get('/clientes/:id', gestionController.obtenerClienteById);
+router.put('/clientes/:id', gestionController.actualizarCliente);
+router.delete('/clientes/:id', gestionController.eliminarCliente);
 
 // PRODUCTOS
-router.get('/productos/:idUsuario', gestionController.obtenerProductos);
+router.get('/productos/usuario/:idUsuario', gestionController.obtenerProductos);
+router.get('/productos/:id', gestionController.obtenerProductoById);
 router.post('/productos', gestionController.crearProducto);
+router.put('/productos/:id', gestionController.actualizarProducto);
+router.delete('/productos/:id', gestionController.eliminarProducto);
 
 module.exports = router;

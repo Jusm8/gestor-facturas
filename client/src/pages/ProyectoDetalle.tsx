@@ -199,10 +199,9 @@ export default function ProyectoDetalle() {
 
     return (
         <div className="detalle-container">
-            <button className="btn-volver" onClick={() => navigate('/proyectos')} style={{ marginBottom: '1rem' }}>
-                ← Volver a Proyectos
+            <button className="btn-volver" onClick={() => navigate(`/dashboard/${id}`)} style={{ marginBottom: '1rem' }}>
+                ← Volver al Menú
             </button>
-
             <h2 style={{ color: '#204080', fontWeight: '700', fontSize: '1.8rem', textAlign: 'center' }}>
                 Listado de Facturas y Presupuestos
             </h2>

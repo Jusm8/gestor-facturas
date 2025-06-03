@@ -28,6 +28,11 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
+      <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
+        <button className="dashboard-volver-btn" onClick={() => navigate('/proyectos')}>
+          ← Volver a Proyectos
+        </button>
+      </div>
       <h1 className="dashboard-titulo-principal">Estás gestionando el proyecto "{nombreProyecto}"</h1>
       <p>¿Qué deseas hacer?</p>
 

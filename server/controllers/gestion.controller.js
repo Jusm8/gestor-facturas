@@ -92,3 +92,44 @@ exports.crearProducto = async (req, res) => {
     res.status(500).json({ error: 'Error al crear producto' });
   }
 };
+
+exports.obtenerProductoById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [resultado] = await db.query('SELECT * FROM Producto WHERE idProducto = ?', [id]);
+    if (resultado.length === 0) return res.status(404).json({ error: 'No encontrado' });
+    res.json(resultado[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener producto' });
+  }
+};
+
+exports.actualizarProducto = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, tipo, precio, descripcion } = req.body;
+  try {
+    await db.query(
+      'UPDATE Producto SET nombre = ?, tipo = ?, precio = ?, descripcion = ? WHERE idProducto = ?',
+      [nombre, tipo, precio, descripcion, id]
+    );
+    res.json({ message: 'Producto actualizado' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error al actualizar producto' });
+  }
+};
+
+exports.eliminarProducto = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [resultado] = await db.query('DELETE FROM Producto WHERE idProducto = ?', [id]);
+
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    res.json({ message: 'Producto eliminado' });
+  } catch (error) {
+    console.error('Error al eliminar producto:', error);
+    res.status(500).json({ error: 'Error al eliminar producto' });
+  }
+};

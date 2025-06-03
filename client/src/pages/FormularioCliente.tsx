@@ -24,7 +24,6 @@ export default function FormularioCliente() {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
-                    console.log(data);
                     if (res.ok) {
                         const limpio = {
                             nombre: data.nombre || '',

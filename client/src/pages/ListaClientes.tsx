@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import '../assets/styles/ListadoClientes.css';
+import { useNavigate, useParams } from 'react-router-dom';
 import { showError, showConfirm, showSuccess } from '../components/alert';
+import '../assets/styles/ListadoClientes.css';
 
 interface Cliente {
   idCliente: number;
@@ -17,6 +17,8 @@ export default function ListaClientes() {
   const [busqueda, setBusqueda] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const { idProyecto } = useParams();
 
   const cargarClientes = async () => {
     const token = localStorage.getItem('token');
@@ -88,6 +90,12 @@ export default function ListaClientes() {
   return (
     <div className="clientes-container">
       <div className="clientes-header">
+        <button
+          className="btn-volver-dashboard"
+          onClick={() => navigate(`/dashboard/${idProyecto}`)}
+        >
+          ← Volver al Menu
+        </button>
         <h1 className="clientes-titulo">Listado de Clientes</h1>
         <input
           type="text"

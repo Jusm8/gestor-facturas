@@ -33,7 +33,6 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-left">
         <img src="/SimplifacLogo.png" alt="Logo" className="logo" />
-        <span className='Dashboard' onClick={() => navigate('/dashboard')}>Home</span>
         <span className='Proyectos' onClick={() => navigate('/Proyectos')}>Proyectos</span>
         <span>More</span>
       </div>

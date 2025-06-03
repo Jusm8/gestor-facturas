@@ -3,12 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
-import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle } from './pages';
-import FormularioDocumento from './pages/FormularioDocumento';
-import DetallePresupuesto from './pages/DetallePresupuesto';
-import DetalleFactura from './pages/DetalleFactura';
-import ListaClientes from './pages/ListaClientes';
-import FormularioCliente from './pages/FormularioCliente';
+import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto } from './pages';
 
 const rootElement = document.getElementById('root');
 
@@ -35,6 +30,9 @@ if (rootElement) {
             <Route path="/ListaClientes" element={<ProtectedRoute><ListaClientes /></ProtectedRoute>} />
             <Route path="/clientes/nuevo" element={<ProtectedRoute><FormularioCliente /></ProtectedRoute>} />
             <Route path="/clientes/editar/:id" element={<ProtectedRoute><FormularioCliente /></ProtectedRoute>} />
+            <Route path="/productos" element={<ProtectedRoute><ListaProductos /></ProtectedRoute>} />
+            <Route path="/productos/nuevo" element={<ProtectedRoute><FormularioProducto /></ProtectedRoute>} />
+            <Route path="/productos/editar/:id" element={<ProtectedRoute><FormularioProducto /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

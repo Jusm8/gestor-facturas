@@ -41,3 +41,19 @@
   display: block;
   margin-bottom: 0.5rem;
 }
+
+.dashboard-volver-btn {
+  background-color: #00c46a;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease;
+}
+
+.dashboard-volver-btn:hover {
+  background-color: #009b52;
+}
