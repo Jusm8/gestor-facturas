@@ -37,7 +37,7 @@ const Dashboard = () => {
           <h3>Documentos</h3>
           <p>Presupuestos y facturas del proyecto.</p>
         </div>
-        <div className="dashboard-card" onClick={() => navigate('/clientes')}>
+        <div className="dashboard-card" onClick={() => navigate('/ListaClientes')}>
           <span className="emoji">👥</span>
           <h3>Clientes</h3>
           <p>Gestionar tus clientes.</p>

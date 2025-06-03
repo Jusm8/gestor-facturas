@@ -1,45 +1,133 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import '../assets/styles/ListadoClientes.css';
+import { showError, showConfirm, showSuccess } from '../components/alert';
 
-const ListaClientes = () => {
-  const [clientes, setClientes] = useState([]);
+interface Cliente {
+  idCliente: number;
+  nombre: string;
+  email: string;
+  nif: string;
+  direccion: string;
+  telefono: string;
+}
+
+export default function ListaClientes() {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [busqueda, setBusqueda] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  const cargarClientes = async () => {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/gestion/clientes/usuario/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      console.log('Respuesta del backend al cargar clientes:', data);
+
+      if (res.ok && Array.isArray(data)) {
+        setClientes(data);
+        setError(null);
+      } else {
+        console.error('Error del backend:', data?.error);
+        setError(data?.error || 'Error al obtener clientes');
+        setClientes([]);
+        //Si da error limpio
+      }
+    } catch (err) {
+      console.error('Error cargando clientes:', err);
+      setError('No se pudo conectar con el servidor');
+      setClientes([]);
+      //Para evitar errores
+    }
+  };
+
+  const handleEliminarCliente = async (idCliente: number) => {
+    const token = localStorage.getItem('token');
+
+    const confirmado = await showConfirm(
+      '¿Estás seguro?',
+      'Esta acción eliminará el cliente de forma permanente'
+    );
+
+    if (!confirmado) return;
+
+    try {
+      const res = await fetch(`http://localhost:3001/api/gestion/clientes/${idCliente}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        setClientes(clientes.filter(c => c.idCliente !== idCliente));
+        await showSuccess('Eliminado', 'Cliente eliminado correctamente');
+      } else {
+        console.error('Error al eliminar cliente');
+        showError('Error', 'No se pudo eliminar el cliente');
+      }
+    } catch (err) {
+      console.error(err);
+      showError('Error de red', 'No se pudo conectar con el servidor');
+    }
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    fetch('http://localhost:3001/api/clientes', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(data => setClientes(data))
-      .catch(err => console.error('Error al cargar clientes:', err));
+    cargarClientes();
   }, []);
+
+  const clientesFiltrados = Array.isArray(clientes)
+    ? clientes.filter(c =>
+      c.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    )
+    : [];
 
   return (
     <div className="clientes-container">
-      <h2 className="clientes-titulo">Listado de Clientes</h2>
-      <table className="clientes-tabla">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>NIF</th>
-            <th>Dirección</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clientes.map((cliente: any) => (
-            <tr key={cliente.idCliente} className="cliente-fila">
-              <td>{cliente.nombre}</td>
-              <td>{cliente.email}</td>
-              <td>{cliente.telefono}</td>
-              <td>{cliente.nif}</td>
-              <td>{cliente.direccion}</td>
-            </tr>
+      <div className="clientes-header">
+        <h1 className="clientes-titulo">Listado de Clientes</h1>
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="cliente-buscador"
+        />
+        <button onClick={() => navigate('/clientes/nuevo')}>+ Nuevo Cliente</button>
+      </div>
+
+      {error && <p className="error-cliente">{error}</p>}
+
+      {clientesFiltrados.length === 0 && !error ? (
+        <p className="no-clientes">No hay clientes que coincidan.</p>
+      ) : (
+        <div className="cliente-lista">
+          {clientesFiltrados.map((cliente) => (
+            <div key={cliente.idCliente} className="cliente-card">
+              <h3>{cliente.nombre}</h3>
+              <p><strong>Email:</strong> {cliente.email}</p>
+              <p><strong>NIF:</strong> {cliente.nif}</p>
+              <p><strong>Teléfono:</strong> {cliente.telefono}</p>
+              <p><strong>Dirección:</strong> {cliente.direccion}</p>
+              <div className="cliente-acciones">
+                <button
+                  className="btn-icon"
+                  title="Editar"
+                  onClick={() => navigate(`/clientes/editar/${cliente.idCliente}`)}
+                >✏️</button>
+                <button
+                  className="btn-icon"
+                  title="Eliminar"
+                  onClick={() => handleEliminarCliente(cliente.idCliente)}
+                >🗑️</button>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      )}
     </div>
   );
-};
-
-export default ListaClientes;
+}

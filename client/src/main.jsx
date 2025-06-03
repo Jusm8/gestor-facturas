@@ -7,6 +7,8 @@ import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, Proyecto
 import FormularioDocumento from './pages/FormularioDocumento';
 import DetallePresupuesto from './pages/DetallePresupuesto';
 import DetalleFactura from './pages/DetalleFactura';
+import ListaClientes from './pages/ListaClientes';
+import FormularioCliente from './pages/FormularioCliente';
 
 const rootElement = document.getElementById('root');
 
@@ -30,6 +32,9 @@ if (rootElement) {
             <Route path="/proyectos/:id/editar" element={<NuevoProyecto />} />
             <Route path="/proyectos/:proyectoId/crear" element={<FormularioDocumento />} />
             <Route path="/documento/:tipo/editar/:id" element={<FormularioDocumento />} />
+            <Route path="/ListaClientes" element={<ProtectedRoute><ListaClientes /></ProtectedRoute>} />
+            <Route path="/clientes/nuevo" element={<ProtectedRoute><FormularioCliente /></ProtectedRoute>} />
+            <Route path="/clientes/editar/:id" element={<ProtectedRoute><FormularioCliente /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
