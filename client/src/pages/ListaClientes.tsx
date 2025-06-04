@@ -18,14 +18,14 @@ export default function ListaClientes() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const { idProyecto } = useParams();
+  const idProyecto = localStorage.getItem('proyectoActual');
 
   const cargarClientes = async () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/clientes/usuario/${user.id}`, {
+      const res = await fetch(`http://localhost:3001/api/gestion/clientes/usuario/${user.id}/proyecto/${idProyecto}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -37,14 +37,13 @@ export default function ListaClientes() {
       } else {
         console.error('Error del backend:', data?.error);
         setError(data?.error || 'Error al obtener clientes');
-        setClientes([]);
         //Si da error limpio
+        setClientes([]);
       }
     } catch (err) {
       console.error('Error cargando clientes:', err);
       setError('No se pudo conectar con el servidor');
       setClientes([]);
-      //Para evitar errores
     }
   };
 

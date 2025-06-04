@@ -50,6 +50,7 @@ export default function FormularioCliente() {
         e.preventDefault();
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const proyectoActual = localStorage.getItem('proyectoActual');
 
         try {
             const res = await fetch(`http://localhost:3001/api/gestion/clientes${esEdicion ? '/' + id : ''}`, {
@@ -58,7 +59,11 @@ export default function FormularioCliente() {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ ...formulario, Usuario_idUsuario: user.id })
+                body: JSON.stringify({
+                    ...formulario,
+                    Usuario_idUsuario: user.id,
+                    Proyecto_idProyecto: Number(proyectoActual)
+                })
             });
 
             const data = await res.json();

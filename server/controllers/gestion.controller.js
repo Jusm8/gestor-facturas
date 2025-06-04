@@ -3,10 +3,10 @@ const db = require('../db');
 //CLIENTES
 exports.obtenerClientes = async (req, res) => {
   try {
-    const { idUsuario } = req.params;
+    const { idUsuario, idProyecto } = req.params;
     const [clientes] = await db.query(
-      'SELECT * FROM Cliente WHERE Usuario_idUsuario = ?',
-      [idUsuario]
+      'SELECT * FROM Cliente WHERE Usuario_idUsuario = ? AND Proyecto_idProyecto = ?',
+      [idUsuario, idProyecto]
     );
     res.json(clientes);
   } catch (error) {
@@ -17,11 +17,13 @@ exports.obtenerClientes = async (req, res) => {
 
 exports.crearCliente = async (req, res) => {
   try {
-    const { nombre, email, nif, direccion, telefono, Usuario_idUsuario } = req.body;
+    const { nombre, email, nif, direccion, telefono, Usuario_idUsuario, Proyecto_idProyecto } = req.body;
+
     const [resultado] = await db.query(
-      'INSERT INTO Cliente (nombre, email, nif, direccion, telefono, Usuario_idUsuario) VALUES (?, ?, ?, ?, ?, ?)',
-      [nombre, email, nif, direccion, telefono, Usuario_idUsuario]
+      'INSERT INTO Cliente (nombre, email, nif, direccion, telefono, Usuario_idUsuario, Proyecto_idProyecto) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [nombre, email, nif, direccion, telefono, Usuario_idUsuario, Proyecto_idProyecto]
     );
+
     res.status(201).json({ idCliente: resultado.insertId });
   } catch (error) {
     console.error('Error al crear cliente:', error);
@@ -70,8 +72,11 @@ exports.eliminarCliente = async (req, res) => {
 //PRODUCTOS
 exports.obtenerProductos = async (req, res) => {
   try {
-    const { idUsuario } = req.params;
-    const [productos] = await db.query('SELECT * FROM Producto WHERE Usuario_idUsuario = ?', [idUsuario]);
+    const { idUsuario, idProyecto } = req.params;
+    const [productos] = await db.query(
+      'SELECT * FROM Producto WHERE Usuario_idUsuario = ? AND Proyecto_idProyecto = ?',
+      [idUsuario, idProyecto]
+    );
     res.json(productos);
   } catch (error) {
     console.error('Error al obtener productos:', error);
@@ -81,11 +86,13 @@ exports.obtenerProductos = async (req, res) => {
 
 exports.crearProducto = async (req, res) => {
   try {
-    const { nombre, tipo, precio, descripcion, Usuario_idUsuario } = req.body;
+    const { nombre, tipo, precio, descripcion, Usuario_idUsuario, Proyecto_idProyecto } = req.body;
+
     const [resultado] = await db.query(
-      'INSERT INTO Producto (nombre, tipo, precio, descripcion, Usuario_idUsuario) VALUES (?, ?, ?, ?, ?)',
-      [nombre, tipo, precio, descripcion, Usuario_idUsuario]
+      'INSERT INTO Producto (nombre, tipo, precio, descripcion, Usuario_idUsuario, Proyecto_idProyecto) VALUES (?, ?, ?, ?, ?, ?)',
+      [nombre, tipo, precio, descripcion, Usuario_idUsuario, Proyecto_idProyecto]
     );
+
     res.status(201).json({ idProducto: resultado.insertId });
   } catch (error) {
     console.error('Error al crear producto:', error);

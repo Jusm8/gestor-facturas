@@ -17,14 +17,15 @@ export default function ListaProductos() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const { idProyecto } = useParams();
+  const params = useParams();
+  const idProyecto = params.idProyecto || localStorage.getItem('proyectoActual');
 
   const cargarProductos = async () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}`, {
+      const res = await fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}/proyecto/${idProyecto}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();

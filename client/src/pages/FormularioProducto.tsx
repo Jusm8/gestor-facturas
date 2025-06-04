@@ -53,6 +53,7 @@ export default function FormularioProducto() {
         e.preventDefault();
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const proyectoActual = localStorage.getItem('proyectoActual');
 
         try {
             const res = await fetch(`http://localhost:3001/api/gestion/productos${esEdicion ? '/' + id : ''}`, {
@@ -61,7 +62,12 @@ export default function FormularioProducto() {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
-                body: JSON.stringify({ ...formulario, precio: parseFloat(formulario.precio), Usuario_idUsuario: user.id })
+                body: JSON.stringify({
+                    ...formulario,
+                    precio: parseFloat(formulario.precio),
+                    Usuario_idUsuario: user.id,
+                    Proyecto_idProyecto: proyectoActual
+                })
             });
 
             if (res.ok) {

@@ -23,7 +23,10 @@ const Dashboard = () => {
       }
     };
 
-    if (idProyecto) fetchNombreProyecto();
+    if (idProyecto) {
+      localStorage.setItem('proyectoActual', idProyecto);
+      fetchNombreProyecto();
+    }
   }, [idProyecto]);
 
   return (
@@ -37,21 +40,33 @@ const Dashboard = () => {
       <p>¿Qué deseas hacer?</p>
 
       <div className="dashboard-grid">
-        <div className="dashboard-card" onClick={() => navigate(`/proyectos/${idProyecto}`)}>
+        <div className="dashboard-card" onClick={() => {
+          localStorage.setItem('proyectoActual', idProyecto || '');
+          navigate(`/proyectos/${idProyecto}`);
+        }}>
           <span className="emoji">📄</span>
           <h3>Documentos</h3>
           <p>Presupuestos y facturas del proyecto.</p>
         </div>
-        <div className="dashboard-card" onClick={() => navigate('/ListaClientes')}>
+
+        <div className="dashboard-card" onClick={() => {
+          localStorage.setItem('proyectoActual', idProyecto || '');
+          navigate('/ListaClientes');
+        }}>
           <span className="emoji">👥</span>
           <h3>Clientes</h3>
           <p>Gestionar tus clientes.</p>
         </div>
-        <div className="dashboard-card" onClick={() => navigate('/productos')}>
+
+        <div className="dashboard-card" onClick={() => {
+          localStorage.setItem('proyectoActual', idProyecto || '');
+          navigate('/productos');
+        }}>
           <span className="emoji">📦</span>
           <h3>Productos</h3>
           <p>Gestionar tus productos.</p>
         </div>
+
       </div>
     </div>
   );
