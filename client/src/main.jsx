@@ -23,6 +23,7 @@ if (rootElement) {
             <Route path="/proyectos/nuevo" element={<ProtectedRoute><NuevoProyecto /></ProtectedRoute>} />
             <Route path="/proyectos/:id" element={<ProtectedRoute><ProyectoDetalle /></ProtectedRoute>} />
             <Route path="/presupuesto/:id/detalle" element={<DetallePresupuesto />} />
+            <Route path="/factura/:id/detalle" element={<DetalleFactura />} />
             <Route path="/factura/:id" element={<ProtectedRoute><DetalleFactura /></ProtectedRoute>} />
             <Route path="/proyectos/:id/editar" element={<NuevoProyecto />} />
             <Route path="/proyectos/:proyectoId/crear" element={<FormularioDocumento />} />

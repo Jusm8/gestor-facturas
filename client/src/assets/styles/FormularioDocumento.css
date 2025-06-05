@@ -91,13 +91,6 @@ button[type="button"]:hover {
   background-color: #357ac3;
 }
 
-td:last-child {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-}
-
 td button {
   display: flex;
   align-items: center;
@@ -209,4 +202,57 @@ input[readonly] {
   background-color: #007bff;
   color: white;
   border-color: #007bff;
+}
+
+.tabla-productos td {
+  vertical-align: middle;
+  padding: 0.75rem;
+  height: 100%;
+}
+
+.tabla-productos td,
+.tabla-productos th {
+  padding: 0.75rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.tabla-productos input[type="checkbox"],
+.tabla-productos input[type="number"] {
+  display: block;
+  margin: 0 auto;
+  padding: 0.5rem;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.tabla-productos td:last-child {
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.4rem;
+  padding: 0.75rem;
+  display: table-cell;
+}
+
+.tabla-productos input[type="checkbox"],
+.tabla-productos input[type="number"] {
+  display: block;
+  margin: 0 auto;
+  padding: 0.5rem;
+  font-size: 1rem;
+  height: 2.25rem;
+  box-sizing: border-box;
+}
+
+.tabla-productos input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  accent-color: #4a90e2;
+  transition: box-shadow 0.2s ease;
+}
+
+.tabla-productos input[type="checkbox"]:hover {
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }

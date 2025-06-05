@@ -192,9 +192,22 @@ export default function ProyectoDetalle() {
     };
 
     const { presupuestos: presupuestosFiltrados, facturas: facturasFiltradas } = aplicarFiltros();
+
+    function agruparPorId<T extends { idFactura: number }>(facturas: T[]): T[] {
+        const mapa = new Map<number, T>();
+        facturas.forEach(f => {
+            if (!mapa.has(f.idFactura)) {
+                mapa.set(f.idFactura, f);
+            }
+        });
+        return Array.from(mapa.values());
+    }
+
+    const facturasSinDuplicados = agruparPorId(facturasFiltradas);
+
     const documentosFiltrados = [
         ...presupuestosFiltrados.map(p => ({ ...p, tipo: 'presupuesto' })),
-        ...facturasFiltradas.map(f => ({ ...f, tipo: 'factura' }))
+        ...facturasSinDuplicados.map(f => ({ ...f, tipo: 'factura' }))
     ];
 
     return (
@@ -266,14 +279,18 @@ export default function ProyectoDetalle() {
                                 <td>{doc.cliente}</td>
                                 <td>{new Date(doc.fecha).toLocaleDateString('es-ES')}</td>
                                 <td>{doc.tipo === 'factura' ? 'Factura' : 'Presupuesto'}</td>
-                                <td>{doc.descripcion || 'N/A'}</td>
+                                <td className="descripcion-celda" title={doc.descripcion}>
+                                    {doc.descripcion && doc.descripcion.length > 60
+                                        ? `${doc.descripcion.slice(0, 60)}...`
+                                        : (doc.descripcion || 'N/A')}
+                                </td>
                                 <td>
                                     <button onClick={() => navigate(`/${doc.tipo}/${doc.tipo === 'factura' ? doc.idFactura : doc.idPresupuesto}/detalle`)}>👁</button>
                                 </td>
-                                <td>
-                                    <button onClick={() => navigate(`/documento/${doc.tipo}/editar/${doc.idFactura || doc.idPresupuesto}`)}>✏️</button>
-                                    <button onClick={() => handleEliminar(doc.tipo, doc.idFactura || doc.idPresupuesto)}>🗑️</button>
-                                    <button onClick={() => handleDescargarDocumento(doc.tipo, doc.idFactura || doc.idPresupuesto)}>⬇️</button>
+                                <td className='acciones-celda'>
+                                    <button title="Editar" onClick={() => navigate(`/documento/${doc.tipo}/editar/${doc.idFactura || doc.idPresupuesto}`)}>✏️</button>
+                                    <button title="Eliminar" onClick={() => handleEliminar(doc.tipo, doc.idFactura || doc.idPresupuesto)}>🗑️</button>
+                                    <button title="Descargar" onClick={() => handleDescargarDocumento(doc.tipo, doc.idFactura || doc.idPresupuesto)}>⬇️</button>
                                 </td>
                             </tr>
                         ))}

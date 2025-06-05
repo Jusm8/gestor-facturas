@@ -24,6 +24,11 @@ export default function FormularioDocumento() {
   const [documentoTipo, setDocumentoTipo] = useState<'presupuesto' | 'factura'>(tipo || 'presupuesto');
   const modoEdicion = !!id;
 
+  const [productosDisponibles, setProductosDisponibles] = useState<any[]>([]);
+  const [productosSeleccionados, setProductosSeleccionados] = useState<{ [id: number]: number }>({});
+
+  const [enviando, setEnviando] = useState(false);
+
   const [clientes, setClientes] = useState<any[]>([]);
   const [formulario, setFormulario] = useState<any>({
     fecha: '',
@@ -39,14 +44,26 @@ export default function FormularioDocumento() {
   });
 
   useEffect(() => {
+    let mounted = true;
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+    fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}/proyecto/${proyectoId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (mounted) setProductosDisponibles(data);
+      })
+      .catch(console.error);
 
     fetch(`http://localhost:3001/api/auth/clientes/${user.id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
-      .then(setClientes)
+      .then(data => {
+        if (mounted) setClientes(data);
+      })
       .catch(console.error);
 
     if (modoEdicion && tipo && id) {
@@ -55,6 +72,7 @@ export default function FormularioDocumento() {
       })
         .then(res => res.json())
         .then(data => {
+          if (!mounted) return;
           setDocumentoTipo(tipo);
           setFormulario({
             fecha: data.fecha || '',
@@ -76,17 +94,24 @@ export default function FormularioDocumento() {
         })
         .catch(console.error);
     }
+
+    return () => {
+      mounted = false;
+    };
   }, [tipo, id, proyectoId, modoEdicion]);
 
   useEffect(() => {
-    const base = formulario.detalles.reduce((acc: number, d: any) =>
-      acc + (parseFloat(d.cantidad || 0) * parseFloat(d.precio_unitario || 0)), 0);
+    const base = Object.entries(productosSeleccionados).reduce((acc, [id, cantidad]) => {
+      const prod = productosDisponibles.find(p => p.idProducto === parseInt(id));
+      return prod ? acc + prod.precio * cantidad : acc;
+    }, 0);
+
     const iva = documentoTipo === 'factura' ? (parseFloat(formulario.iva || '0') / 100) : 0;
     const ret = documentoTipo === 'factura' ? (parseFloat(formulario.retencion || '0') / 100) : 0;
     const total = base + base * iva - base * ret;
 
-    setFormulario((f: any) => ({ ...f, total: total.toFixed(2) }));
-  }, [formulario.detalles, formulario.iva, formulario.retencion, documentoTipo]);
+    setFormulario(f => ({ ...f, total: total.toFixed(2) }));
+  }, [productosSeleccionados, formulario.iva, formulario.retencion]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
@@ -123,31 +148,25 @@ export default function FormularioDocumento() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (enviando) return;
+    setEnviando(true);
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    //Validacionespara evitar errores
-    if (!formulario.cliente) {
-      showError('Error', 'Debes seleccionar un cliente.');
-      return;
-    }
+    const detallesList = Object.entries(productosSeleccionados).map(([id, cantidad]) => {
+      const producto = productosDisponibles.find(p => p.idProducto === parseInt(id));
+      return {
+        cantidad,
+        descripcion: producto.descripcion,
+        precio_unitario: producto.precio,
+        Producto_idProducto: producto.idProducto
+      };
+    });
 
-    if (!formulario.proyecto) {
-      showError('Error', 'No se ha definido el proyecto. Asegúrate de acceder desde un proyecto.');
-      return;
-    }
-
-    if (!formulario.detalles || formulario.detalles.length === 0) {
-      showError('Error', 'Agrega al menos un producto al detalle.');
-      return;
-    }
-
-    const detallesValidos = formulario.detalles.every((d: any) =>
-      d.descripcion && d.cantidad && d.precio_unitario && d.producto
-    );
-
-    if (!detallesValidos) {
-      showError('Error', 'Completa todos los campos de los productos antes de guardar.');
+    if (detallesList.length === 0) {
+      showError('Error', 'Selecciona al menos un producto para continuar.');
+      setEnviando(false);
       return;
     }
 
@@ -155,15 +174,11 @@ export default function FormularioDocumento() {
       fecha: formulario.fecha,
       forma_pago: formulario.forma_pago,
       estado: formulario.estado,
+      total: parseFloat(formulario.total),
       Usuario_idUsuario: user.id,
       Cliente_idCliente: parseInt(formulario.cliente),
       Proyecto_idProyecto: parseInt(formulario.proyecto),
-      detalles: formulario.detalles.map((d: any) => ({
-        cantidad: parseFloat(d.cantidad),
-        descripcion: d.descripcion,
-        precio_unitario: parseFloat(d.precio_unitario),
-        Producto_idProducto: parseInt(d.producto)
-      }))
+      detalles: detallesList
     };
 
     if (documentoTipo === 'factura') {
@@ -201,6 +216,8 @@ export default function FormularioDocumento() {
     } catch (err) {
       console.error('Error de red:', err);
       showError('Error', 'No se pudo conectar con el servidor');
+    } finally {
+      setEnviando(false);
     }
   };
 
@@ -264,34 +281,69 @@ export default function FormularioDocumento() {
       <label>Cliente:</label>
       <select name="cliente" value={formulario.cliente} onChange={handleChange}>
         <option value="">Seleccione un cliente</option>
-        {clientes.map(c => (
-          <option key={c.idCliente} value={c.idCliente}>{c.nombre}</option>
+        {clientes.map((c) => (
+          <option key={c.idCliente} value={c.idCliente.toString()}>
+            {c.nombre}
+          </option>
         ))}
       </select>
 
-      <h4>Detalles</h4>
-      {formulario.detalles.map((d: any, i: number) => (
-        <div key={i} className="detalle-item">
-          <div className="detalle-inputs">
-            <input placeholder="Descripción" value={d.descripcion} onChange={e => handleDetalleChange(i, 'descripcion', e.target.value)} />
-            <input type="number" placeholder="Cantidad" value={d.cantidad} onChange={e => handleDetalleChange(i, 'cantidad', e.target.value)} />
-            <input type="number" placeholder="Precio" value={d.precio_unitario} onChange={e => handleDetalleChange(i, 'precio_unitario', e.target.value)} />
-            <input placeholder="ID Producto" value={d.producto} onChange={e => handleDetalleChange(i, 'producto', e.target.value)} />
-          </div>
-          {formulario.detalles.length > 1 && (
-            <button type="button" className="btn-eliminar" onClick={() => eliminarProducto(i)}>🗑️</button>
-          )}
-        </div>
-      ))}
+      <h4>Productos</h4>
+      <table className="tabla-productos">
+        <thead>
+          <tr>
+            <th>Seleccionar</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Nombre</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productosDisponibles.map(prod => (
+            <tr key={prod.idProducto}>
+              <td>
+                <input
+                  type="checkbox"
+                  checked={prod.idProducto in productosSeleccionados}
+                  onChange={e => {
+                    const checked = e.target.checked;
+                    setProductosSeleccionados(prev => {
+                      const nuevo = { ...prev };
+                      if (checked) nuevo[prod.idProducto] = 1;
+                      else delete nuevo[prod.idProducto];
+                      return nuevo;
+                    });
+                  }}
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  min="1"
+                  disabled={!(prod.idProducto in productosSeleccionados)}
+                  value={productosSeleccionados[prod.idProducto] || ''}
+                  onChange={e => {
+                    const cantidad = parseInt(e.target.value) || 1;
+                    setProductosSeleccionados(prev => ({ ...prev, [prod.idProducto]: cantidad }));
+                  }}
+                />
+              </td>
+              <td>{prod.precio}€</td>
+              <td>{prod.nombre}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <label>Total:</label>
       <input type="number" value={formulario.total} readOnly />
 
       <div className="button-group">
-        <button type="button" onClick={agregarProducto}>+ Añadir Producto</button>
-        <button type="submit">Guardar</button>
+        <button type="submit" disabled={enviando}>
+          {enviando ? 'Guardando...' : 'Guardar'}
+        </button>
         <button type="button" onClick={() => navigate(`/proyectos/${proyectoId || formulario.proyecto}`)}>Cancelar</button>
       </div>
-    </form>
+    </form >
   );
 }

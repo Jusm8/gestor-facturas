@@ -264,7 +264,7 @@ exports.crearPresupuesto = async (req, res) => {
     connection.release();
   }
 };
-
+/*
 exports.crearFactura = async (req, res) => {
   const {
     fecha,
@@ -313,7 +313,7 @@ exports.crearFactura = async (req, res) => {
   } finally {
     connection.release();
   }
-};
+};*/
 
 //Obtener clientes
 exports.obtenerClientes = async (req, res) => {
