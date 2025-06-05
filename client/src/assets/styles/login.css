@@ -55,7 +55,7 @@ body {
 .login-card input {
     padding: 0.5rem;
     border-radius: 20px;
-    border: none;
+    border: 1px solid black;
     margin-bottom: 0.5rem;
 }
 
@@ -73,4 +73,41 @@ body {
 .login-card p {
     margin-top: 1rem;
     text-align: center;
+}
+
+.login-info-panel {
+  flex: 1;
+  padding: 2rem;
+  color: white;
+  text-align: center;
+  margin-left: 5vw;
+}
+
+.login-info-panel .login-logo {
+  width: 100px;
+  margin-bottom: 1.5rem;
+}
+
+.login-info-panel h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.login-info-panel p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.login-info-panel ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.login-info-panel ul li {
+  margin: 0.3rem 0;
 }

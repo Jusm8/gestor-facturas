@@ -50,13 +50,15 @@
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.8rem;
   padding-left: 1rem;
 }
 
 .right-panel button {
+  width: 140px;
+  text-align: center;
   background-color: #4760c0;
   color: white;
   border: none;
@@ -92,7 +94,7 @@
 }
 
 .profile-img input[type="file"] {
-  max-width: 200px;
+  max-width: 550px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -109,4 +111,37 @@
   justify-content: center;
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
+}
+
+.custom-file-upload {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.custom-file-upload label {
+  background-color: #4760c0;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none;
+}
+
+.user-image {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.right-panel,
+.cancel-btn {
+  margin-left: auto;
 }

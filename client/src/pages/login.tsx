@@ -8,7 +8,7 @@ import { showError, showSuccess } from '../components/alert';
 export default function Login() {
     const { setUser } = useAuth();
 
-    const [form, setForm] = useState({ nombre: '', email: '', password: '', confirm: '' });
+    const [form, setForm] = useState({ email: '', password: '', confirm: '' });
 
     const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -44,12 +44,20 @@ export default function Login() {
 
     return (
         <div className="login-container">
+            <div className="login-info-panel">
+                <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
+                <h2>Bienvenido a SimpliFac</h2>
+                <p>Gestiona tus facturas y presupuestos de forma sencilla y eficiente.</p>
+                <ul>
+                    <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos</li>
+                    <li>Añade a sus clientes y sus productos para crear de forma rapida y clara su propia factura</li>
+                    <li>Previsualize su factura y presupuestos para ver como quedara antes de descargarlo </li>
+                </ul>
+            </div>
+
             <div className="login-card">
                 <h2>LOGIN TO YOUR ACCOUNT</h2>
                 <form onSubmit={handleSubmit}>
-                    <label>Usuario:</label>
-                    <input type="text" name="nombre" value={form.nombre} onChange={handleChange} required />
-
                     <label>Email:</label>
                     <input type="email" name="email" value={form.email} onChange={handleChange} required />
 
@@ -61,5 +69,7 @@ export default function Login() {
                 <p>¿No tiene una cuenta? <Link to="/register">Cree una</Link></p>
             </div>
         </div>
+
+
     );
 }

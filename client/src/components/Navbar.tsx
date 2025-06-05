@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 export default function Navbar() {
 
-  const { setUser } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   //logout
@@ -37,8 +37,24 @@ export default function Navbar() {
         <span>More</span>
       </div>
       <div className="navbar-right">
-        <span className="usuario" onClick={() => navigate('/perfil')}>Usuario</span>
-        <FaUserCircle size={38} />
+        <span className="usuario" onClick={() => navigate('/perfil')}>
+          {user?.nombre || 'Usuario'}
+        </span>
+
+        {user?.imagen_url ? (
+          <img
+            src={
+              user.imagen_url.startsWith('/uploads/')
+                ? `http://localhost:3001${user.imagen_url}`
+                : user.imagen_url
+            }
+            alt="Perfil"
+            className="user-image"
+            onClick={() => navigate('/perfil')}
+          />
+        ) : (
+          <FaUserCircle size={38} onClick={() => navigate('/perfil')} />
+        )}
         <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>
 

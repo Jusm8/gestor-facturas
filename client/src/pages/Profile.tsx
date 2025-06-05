@@ -41,6 +41,24 @@ export default function Profile() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleCancel = () => {
+    if (user) {
+      setForm({
+        nombre: user.nombre || '',
+        email: user.email || '',
+        rol: user.rol || '',
+        imagen_url: user.imagen_url || '',
+        fecha_nacimiento: user.fecha_nacimiento
+          ? new Date(user.fecha_nacimiento).toISOString().split('T')[0]
+          : '',
+        sexo: user.sexo || '',
+        localidad: user.localidad || ''
+      });
+      setImagenFile(null);
+      setEditMode(false);
+    }
+  };
+
   //Subir una foto de perfil
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -129,7 +147,17 @@ export default function Profile() {
           ) : (
             <div className="placeholder-img">Sin imagen</div>
           )}
-          {editMode && <input type="file" name="imagen" onChange={handleImageUpload} />}
+          {editMode && (
+            <div className="custom-file-upload">
+              <label htmlFor="imagen">Seleccionar imagen</label>
+              <input
+                id="imagen"
+                type="file"
+                name="imagen"
+                onChange={handleImageUpload}
+              />
+            </div>
+          )}
         </div>
 
         <div className="profile-info">
@@ -193,6 +221,15 @@ export default function Profile() {
         >
           {editMode ? 'Guardar' : 'Editar'}
         </button>
+        {editMode && (
+          <button
+            className="cancel-btn"
+            type="button"
+            onClick={handleCancel}
+          >
+            Cancelar
+          </button>
+        )}
       </div>
     </div>
   );

@@ -264,56 +264,6 @@ exports.crearPresupuesto = async (req, res) => {
     connection.release();
   }
 };
-/*
-exports.crearFactura = async (req, res) => {
-  const {
-    fecha,
-    estado,
-    Cliente_idCliente,
-    Proyecto_idProyecto,
-    detalles
-  } = req.body;
-
-  const connection = await pool.getConnection();
-  await connection.beginTransaction();
-
-  try {
-    const [facturaRes] = await connection.query(
-      `INSERT INTO Factura (fecha, estado, total, Cliente_idCliente, Proyecto_idProyecto)
-       VALUES (?, ?, ?, ?, ?)`,
-      [fecha, estado, Cliente_idCliente, Proyecto_idProyecto]
-    );
-
-    const facturaId = facturaRes.insertId;
-    let total = 0;
-
-    for (const detalle of detalles) {
-      const { Producto_idProducto, cantidad, precio_unitario } = detalle;
-
-      await connection.query(
-        `INSERT INTO FacturaDetalle (cantidad, precio_unitario, Factura_idFactura, Producto_idProducto)
-         VALUES (?, ?, ?, ?)`,
-        [cantidad, precio_unitario, facturaId, Producto_idProducto]
-      );
-
-      total += cantidad * precio_unitario;
-    }
-
-    await connection.query(
-      `UPDATE Factura SET total = ? WHERE idFactura = ?`,
-      [total, facturaId]
-    );
-
-    await connection.commit();
-    res.status(201).json({ message: 'Factura creada correctamente', id: facturaId });
-  } catch (error) {
-    await connection.rollback();
-    console.error('Error al crear factura:', error);
-    res.status(500).json({ error: 'Error al crear factura' });
-  } finally {
-    connection.release();
-  }
-};*/
 
 //Obtener clientes
 exports.obtenerClientes = async (req, res) => {
