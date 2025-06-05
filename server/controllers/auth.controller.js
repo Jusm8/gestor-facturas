@@ -2,31 +2,76 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const { ImGift } = require('react-icons/im');
+const { sendVerificationEmail } = require('../utils/mail');
 
 //Registro de usuario
 exports.register = async (req, res) => {
   const { nombre, email, password, rol } = req.body;
 
   try {
-    //Verificar si ya se usa el email
+    // Verificar si ya existe el email
     const [existing] = await pool.query('SELECT idUsuario FROM Usuario WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(409).json({ error: 'El email ya está registrado.' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Generar código de verificación
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-    //Insertar nuevo usuario
+    // Guardar datos temporalmente en memoria global
+    global.pendingUsers = global.pendingUsers || {};
+    global.pendingUsers[email] = {
+      nombre,
+      email,
+      password,
+      rol,
+      code: verificationCode,
+      //Aprox 10 minutos
+      expiresAt: Date.now() + 10 * 60 * 1000
+    };
+
+    // Enviar código por email
+    await sendVerificationEmail(email, verificationCode);
+
+    res.status(200).json({ message: 'Código de verificación enviado al correo.' });
+
+  } catch (error) {
+    console.error('Error en el registro:', error);
+    res.status(500).json({ error: 'Error al iniciar el proceso de registro.' });
+  }
+};
+
+exports.verifyCodeAndRegister = async (req, res) => {
+  const { email, code } = req.body;
+
+  const pending = global.pendingUsers?.[email];
+  if (!pending) {
+    return res.status(400).json({ error: 'No hay una solicitud de registro para este correo' });
+  }
+
+  if (parseInt(code) !== pending.code) {
+    return res.status(400).json({ error: 'Código incorrecto' });
+  }
+
+  if (Date.now() > pending.expiresAt) {
+    delete global.pendingUsers[email];
+    return res.status(400).json({ error: 'El código ha expirado' });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(pending.password, 10);
+
     await pool.query(
       'INSERT INTO Usuario (nombre, email, password, rol) VALUES (?, ?, ?, ?)',
-      [nombre, email, hashedPassword, rol]
+      [pending.nombre, pending.email, hashedPassword, pending.rol]
     );
-    //Confirmar que se registro el usuario
+
+    delete global.pendingUsers[email];
+
     res.status(201).json({ message: 'Usuario registrado correctamente' });
   } catch (error) {
-    //Error en el registro
-    console.error('Error en el registro:', error);
-    res.status(500).json({ error: 'Error en el registro' });
+    console.error('Error al verificar y registrar:', error);
+    res.status(500).json({ error: 'Error final al registrar' });
   }
 };
 

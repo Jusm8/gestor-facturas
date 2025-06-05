@@ -24,6 +24,8 @@ const upload = multer({ storage });
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
+//Ruta para verificar el codigo
+router.post('/verify', authController.verifyCodeAndRegister);
 
 //Proyectos
 router.post('/proyecto', authController.crearProyecto);
