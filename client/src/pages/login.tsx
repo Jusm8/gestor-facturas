@@ -49,9 +49,9 @@ export default function Login() {
                 <h2>Bienvenido a SimpliFac</h2>
                 <p>Gestiona tus facturas y presupuestos de forma sencilla y eficiente.</p>
                 <ul>
-                    <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos</li>
-                    <li>Añade a sus clientes y sus productos para crear de forma rapida y clara su propia factura</li>
-                    <li>Previsualize su factura y presupuestos para ver como quedara antes de descargarlo </li>
+                    <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos.</li>
+                    <li>Añade a sus clientes y sus productos para crear de forma rapida y clara su propia factura.</li>
+                    <li>Previsualize su factura y presupuestos para ver como quedara antes de descargarlo.</li>
                 </ul>
             </div>
 

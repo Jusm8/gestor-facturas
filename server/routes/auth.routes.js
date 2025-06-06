@@ -26,6 +26,10 @@ router.post('/login', authController.login);
 router.put('/update', upload.single('imagen'), authController.updateProfile);
 //Ruta para verificar el codigo
 router.post('/verify', authController.verifyCodeAndRegister);
+//Ruta para cambiar la contraseña
+router.put('/change-password', authController.changePassword);
+//Borrar cuenta
+router.delete('/delete-account', authController.deleteAccount);
 
 //Proyectos
 router.post('/proyecto', authController.crearProyecto);

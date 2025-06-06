@@ -53,7 +53,9 @@ export default function Navbar() {
             onClick={() => navigate('/perfil')}
           />
         ) : (
-          <FaUserCircle size={38} onClick={() => navigate('/perfil')} />
+          <span onClick={() => navigate('/perfil')} style={{ cursor: 'pointer' }}>
+            <FaUserCircle size={38} />
+          </span>
         )}
         <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>

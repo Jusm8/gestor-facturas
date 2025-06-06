@@ -58,6 +58,13 @@ exports.verifyCodeAndRegister = async (req, res) => {
     return res.status(400).json({ error: 'El código ha expirado' });
   }
 
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!passwordRegex.test(pending.password)) {
+    delete global.pendingUsers[email];
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número' });
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(pending.password, 10);
 
@@ -409,5 +416,97 @@ exports.obtenerProductosPorUsuario = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener productos:', error);
     res.status(500).json({ error: 'Error al obtener productos' });
+  }
+};
+
+exports.changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'No autorizado' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const [rows] = await pool.query('SELECT password FROM Usuario WHERE idUsuario = ?', [userId]);
+    const user = rows[0];
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(403).json({ error: 'Contraseña actual incorrecta' });
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número' });
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+
+    await pool.query('UPDATE Usuario SET password = ? WHERE idUsuario = ?', [hashed, userId]);
+
+    res.json({ message: 'Contraseña actualizada correctamente' });
+  } catch (error) {
+    console.error('Error al cambiar contraseña:', error);
+    res.status(500).json({ error: 'Error al cambiar contraseña' });
+  }
+};
+
+exports.deleteAccount = async (req, res) => {
+  const { password } = req.body;
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'No autorizado' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    const [rows] = await pool.query('SELECT * FROM Usuario WHERE idUsuario = ?', [userId]);
+    const user = rows[0];
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(403).json({ error: 'Contraseña incorrecta' });
+
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      //Eliminar presupuestos
+      const [presupuestos] = await conn.query('SELECT idPresupuesto FROM Presupuesto WHERE Usuario_idUsuario = ?', [userId]);
+      for (const p of presupuestos) {
+        await conn.query('DELETE FROM Producto_has_PresupuestoDetalle WHERE PresupuestoDetalle_idPresupuestoDetalle IN (SELECT idPresupuestoDetalle FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?)', [p.idPresupuesto]);
+        await conn.query('DELETE FROM PresupuestoDetalle WHERE Presupuesto_idPresupuesto = ?', [p.idPresupuesto]);
+      }
+      await conn.query('DELETE FROM Presupuesto WHERE Usuario_idUsuario = ?', [userId]);
+
+      //Eliminar facturas (opcional: si conectadas a usuario)
+      await conn.query('DELETE FROM FacturaDetalle WHERE Factura_idFactura IN (SELECT idFactura FROM Factura WHERE Cliente_idCliente IN (SELECT idCliente FROM Cliente WHERE Usuario_idUsuario = ?))', [userId]);
+      await conn.query('DELETE FROM Factura WHERE Cliente_idCliente IN (SELECT idCliente FROM Cliente WHERE Usuario_idUsuario = ?)', [userId]);
+
+      //Eliminar productos y clientes
+      await conn.query('DELETE FROM Producto WHERE Usuario_idUsuario = ?', [userId]);
+      await conn.query('DELETE FROM Cliente WHERE Usuario_idUsuario = ?', [userId]);
+
+      //Eliminar proyectos
+      await conn.query('DELETE FROM Proyecto WHERE Usuario_idUsuario = ?', [userId]);
+
+      //Eliminar usuario
+      await conn.query('DELETE FROM Usuario WHERE idUsuario = ?', [userId]);
+
+      await conn.commit();
+      res.json({ message: 'Cuenta eliminada correctamente' });
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  } catch (error) {
+    console.error('Error al eliminar cuenta:', error);
+    res.status(500).json({ error: 'Error al eliminar la cuenta' });
   }
 };

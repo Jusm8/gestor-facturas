@@ -11,6 +11,10 @@ export default function Profile() {
   const [editMode, setEditMode] = useState(false);
   const [imagenFile, setImagenFile] = useState<File | null>(null);
 
+  const [deletePassword, setDeletePassword] = useState('');
+
+  const [confirmDeleteVisible, setConfirmDeleteVisible] = useState(false);
+
   const [form, setForm] = useState({
     nombre: user?.nombre || '',
     email: user?.email || '',
@@ -131,11 +135,136 @@ export default function Profile() {
     setEditMode(false);
   };
 
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      showError('La contraseña debe tener al menos 8 caracteres, una mayúscula y un número');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      showError('Las nuevas contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          oldPassword,
+          newPassword
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showSuccess('Contraseña actualizada', 'Tu contraseña se ha cambiado con éxito');
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        showError(data.error || 'Error al cambiar la contraseña');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showError('No se pudo conectar con el servidor');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const token = localStorage.getItem('token');
+
+    if (!deletePassword) {
+      showError('Introduce tu contraseña para confirmar');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ password: deletePassword })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        showSuccess('Cuenta eliminada', 'Tu cuenta y datos han sido eliminados');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/login');
+      } else {
+        showError(data.error || 'Error al eliminar la cuenta');
+      }
+    } catch (err) {
+      console.error(err);
+      showError('Error al conectar con el servidor');
+    }
+  };
+
   return (
     <div className="profile-wrapper">
+      {/*Panel izquierdo para cambiar contraseña y borrar cuenta*/}
       <div className="left-panel">
-        <h3>Espacio para futuras funcionalidades</h3>
+        <h3>Cambiar contraseña</h3>
+        <form onSubmit={handleChangePassword} className="password-form">
+          <label>Contraseña actual:</label>
+          <input type="password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
+
+          <label>Nueva contraseña:</label>
+          <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
+
+          <label>Confirmar nueva contraseña:</label>
+          <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+
+          <button type="submit">Actualizar contraseña</button>
+        </form>
+
+        <div className="delete-account-section">
+          <h4>Eliminar cuenta</h4>
+
+          {!confirmDeleteVisible ? (
+            <button className="delete-btn" onClick={() => setConfirmDeleteVisible(true)}>
+              Eliminar cuenta
+            </button>
+          ) : (
+            <>
+              <p>
+                Introduce tu contraseña para confirmar la eliminación de tu cuenta.
+                <br />
+                <strong>Esta acción es irreversible.</strong>
+              </p>
+              <input
+                type="password"
+                placeholder="Contraseña actual"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+              />
+              <button className="delete-btn" onClick={handleDeleteAccount}>
+                Confirmar eliminación
+              </button>
+            </>
+          )}
+        </div>
       </div>
+
+      {/*Panel derecho para editar perfil */}
       <form id="profile-form" className="profile-card" onSubmit={handleSubmit}>
         <div className="profile-img">
           {form.imagen_url ? (

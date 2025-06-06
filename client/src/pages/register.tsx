@@ -64,6 +64,7 @@ export default function Register() {
 
       if (response.ok) {
         showSuccess('Registro completado', 'Ya puedes iniciar sesión');
+
         //Redirigir al login
         navigate('/login');
       } else {
