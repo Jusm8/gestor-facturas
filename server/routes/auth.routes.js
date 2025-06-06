@@ -30,6 +30,11 @@ router.post('/verify', authController.verifyCodeAndRegister);
 router.put('/change-password', authController.changePassword);
 //Borrar cuenta
 router.delete('/delete-account', authController.deleteAccount);
+//Rutas para opciones Admin
+router.get('/usuarios', authController.obtenerUsuarios);
+router.put('/admin/ban/:id', authController.banUser);
+router.post('/admin/unban', authController.unbanUser);
+router.delete('/admin/delete/:id', authController.deleteUserByAdmin);
 
 //Proyectos
 router.post('/proyecto', authController.crearProyecto);

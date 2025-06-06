@@ -1,0 +1,157 @@
+.resumen-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(to right, #4760c0, #17224d);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.resumen-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+  text-shadow: 1px 1px 4px #00000050;
+}
+
+/* Select personalizado */
+.resumen-container select {
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+  margin-left: 0.5rem;
+}
+
+.resumen-container select:focus {
+  outline: 2px solid #42a5f5;
+}
+
+/* Estados */
+.status-message {
+  font-weight: bold;
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+  width: fit-content;
+}
+
+.status-warning {
+  background-color: #ffa726;
+  color: black;
+}
+
+.status-info {
+  background-color: #42a5f5;
+  color: white;
+}
+
+.status-error {
+  background-color: #ef5350;
+  color: white;
+}
+
+.status-success {
+  background-color: #66bb6a;
+  color: white;
+}
+
+/* Botones */
+.admin-controls {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.admin-controls button {
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-ban {
+  background-color: #ff7043;
+  color: white;
+}
+
+.btn-ban:hover {
+  background-color: #f4511e;
+}
+
+.btn-unban {
+  background-color: #29b6f6;
+  color: white;
+}
+
+.btn-unban:hover {
+  background-color: #039be5;
+}
+
+.btn-delete {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #b71c1c;
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  background-color: white;
+  color: black;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+th {
+  background-color: #eeeeee;
+  font-weight: bold;
+}
+
+/*Filtros*/
+.admin-filtros {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-filtros input,
+.admin-filtros select {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.admin-selector {
+  margin-bottom: 1rem;
+}
+
+.admin-selector select {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+  outline: none;
+}

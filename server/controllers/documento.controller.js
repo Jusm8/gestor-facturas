@@ -386,3 +386,15 @@ exports.editarFactura = async (req, res) => {
     conn.release();
   }
 };
+
+exports.obtenerResumenUsuario = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.query('CALL obtenerDocumentosUsuario(?)', [id]);
+    //El resultado está en el primer índice
+    res.json(rows[0]); 
+  } catch (err) {
+    console.error('Error al obtener resumen:', err);
+    res.status(500).json({ error: 'Error al obtener resumen' });
+  }
+};

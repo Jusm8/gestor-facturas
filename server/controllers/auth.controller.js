@@ -510,3 +510,67 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar la cuenta' });
   }
 };
+exports.obtenerUsuarios = async (req, res) => {
+  try {
+    const [usuarios] = await pool.query('SELECT idUsuario AS id, nombre, email, rol FROM Usuario');
+    res.json(usuarios);
+  } catch (error) {
+    console.error('Error obteniendo usuarios:', error);
+    res.status(500).json({ error: 'Error al obtener los usuarios' });
+  }
+};
+
+exports.banUser = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('UPDATE Usuario SET rol = "baneado" WHERE idUsuario = ?', [id]);
+    res.json({ message: 'Usuario baneado' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al banear el usuario' });
+  }
+};
+
+exports.unbanUser = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email es requerido' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      'UPDATE Usuario SET rol = "usuario" WHERE email = ? AND rol = "baneado"',
+      [email]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado o no estaba baneado' });
+    }
+
+    res.json({ message: 'Usuario desbaneado correctamente' });
+  } catch (error) {
+    console.error('Error al desbanear usuario:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+};
+
+exports.deleteUserByAdmin = async (req, res) => {
+  const { id } = req.params;
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    await conn.query('DELETE FROM Producto WHERE Usuario_idUsuario = ?', [id]);
+    await conn.query('DELETE FROM Cliente WHERE Usuario_idUsuario = ?', [id]);
+    await conn.query('DELETE FROM Proyecto WHERE Usuario_idUsuario = ?', [id]);
+    await conn.query('DELETE FROM Usuario WHERE idUsuario = ?', [id]);
+
+    await conn.commit();
+    res.json({ message: 'Cuenta y datos eliminados' });
+  } catch (error) {
+    await conn.rollback();
+    res.status(500).json({ error: 'Error al eliminar cuenta' });
+  } finally {
+    conn.release();
+  }
+};

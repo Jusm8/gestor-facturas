@@ -27,6 +27,10 @@ export default function Login() {
             const data = await response.json();
 
             if (response.ok) {
+                if (data.user.rol === 'baneado') {
+                    showError('Esta cuenta ha sido bloqueada por uso indebido.');
+                    return;
+                }
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
                 setUser(data.user);

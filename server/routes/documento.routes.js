@@ -35,4 +35,7 @@ router.get('/factura/:id', documentoController.getFacturaById);
 router.put('/presupuesto/:id', documentoController.editarPresupuesto);
 router.put('/factura/:id', documentoController.editarFactura);
 
+//Resumen de los documentos del usuario
+router.get('/resumen/:id', documentoController.obtenerResumenUsuario);
+
 module.exports = router;
