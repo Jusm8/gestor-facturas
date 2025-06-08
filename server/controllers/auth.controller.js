@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const pool = require('../db');
 const { ImGift } = require('react-icons/im');
 const { sendVerificationEmail } = require('../utils/mail');
+const nodemailer = require('nodemailer');
 
 //Registro de usuario
 exports.register = async (req, res) => {
@@ -114,6 +115,7 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: 'Error en el login' });
   }
 };
+
 const cleanDate = (dateStr) => {
   if (!dateStr) return null;
   //Tiempo en modo YYYY-MM-DD
@@ -520,6 +522,17 @@ exports.obtenerUsuarios = async (req, res) => {
   }
 };
 
+exports.obtenerUsuarioById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.query('SELECT idUsuario AS id, nombre, email, rol FROM Usuario WHERE idUsuario = ?', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.json(rows[0]);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener usuario' });
+  }
+};
+
 exports.banUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -572,5 +585,30 @@ exports.deleteUserByAdmin = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar cuenta' });
   } finally {
     conn.release();
+  }
+};
+
+exports.recibirApelacion = async (req, res) => {
+  const { email, mensaje } = req.body;
+
+  if (!email || !mensaje) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  try {
+    const { sendVerificationEmail } = require('../utils/mail');
+    const transporter = require('../utils/mail').transporter;
+
+    await transporter.sendMail({
+      from: `"SimpliFac" <${process.env.EMAIL_FROM}>`,
+      to: process.env.EMAIL_FROM,
+      subject: `Apelación de desbaneo - ${email}`,
+      text: mensaje,
+    });
+
+    res.status(200).json({ message: 'Apelación enviada' });
+  } catch (error) {
+    console.error('Error SMTP:', error);
+    res.status(500).json({ error: 'No se pudo enviar el mensaje', detalle: error.toString() });
   }
 };

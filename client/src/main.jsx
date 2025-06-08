@@ -5,6 +5,8 @@ import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute } from './components';
 import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto, AdminView } from './pages';
 import AdminRoute from './components/AdminRoute';
+import BannedPage from './pages/BannedPage';
+import CheckBanRedirect from './components/CheckBanRedirect';
 
 const rootElement = document.getElementById('root');
 
@@ -13,6 +15,7 @@ if (rootElement) {
     <React.StrictMode>
       <AuthProvider>
         <BrowserRouter>
+          <CheckBanRedirect />
           <Navbar />
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
@@ -36,6 +39,7 @@ if (rootElement) {
             <Route path="/productos/nuevo" element={<ProtectedRoute><FormularioProducto /></ProtectedRoute>} />
             <Route path="/productos/editar/:id" element={<ProtectedRoute><FormularioProducto /></ProtectedRoute>} />
             <Route path="/resumen" element={<AdminRoute><AdminView /></AdminRoute>} />
+            <Route path="/baneado" element={<BannedPage />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

@@ -96,7 +96,7 @@ export default function AdminView() {
   const handleDelete = async () => {
     if (!window.confirm('¿Seguro que deseas eliminar esta cuenta permanentemente?')) return;
 
-    await fetch(`http://localhost:3001/api/admin/delete/${selectedUser?.id}`, {
+    await fetch(`http://localhost:3001/api/auth/admin/delete/${selectedUserId}`, {
       method: 'DELETE'
     });
     showConfirm('Usuario eliminado');

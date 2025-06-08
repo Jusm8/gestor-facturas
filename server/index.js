@@ -17,6 +17,7 @@ app.use('/api/documento', require('./routes/documento.routes'));
 
 app.use('/api/gestion', require('./routes/gestion.routes'));
 
+app.use('/api/auth', require('./routes/auth.routes'));
 
 app.listen(process.env.PORT, () => {
   console.log(`Servidor backend en http://localhost:${process.env.PORT}`);

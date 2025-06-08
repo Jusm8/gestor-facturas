@@ -1,20 +1,18 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
 
-  if (!token) return <Navigate to="/login" />;
-
-  //Si el usuario está baneado, lo sacamos de la app y limpiamos sesión
-  if (user.rol === 'baneado') {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  if (!user) {
     return <Navigate to="/login" />;
   }
 
-  return <>{children}</>;
+  if (user.rol === 'baneado') {
+    return <Navigate to="/baneado" />;
+  }
+
+  return children;
 };
 
 export default ProtectedRoute;

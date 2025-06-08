@@ -36,6 +36,11 @@ router.put('/admin/ban/:id', authController.banUser);
 router.post('/admin/unban', authController.unbanUser);
 router.delete('/admin/delete/:id', authController.deleteUserByAdmin);
 
+//Baneos
+router.post('/ban-appeal', authController.recibirApelacion);
+
+router.get('/usuarios/:id', authController.obtenerUsuarioById);
+
 //Proyectos
 router.post('/proyecto', authController.crearProyecto);
 router.get('/proyectos/usuario/:idUsuario', authController.obtenerProyectosPorUsuario);

@@ -23,3 +23,5 @@ exports.sendVerificationEmail = async (to, code) => {
   console.log('Test debug')
   console.log('Mensaje enviado: %s', info.messageId);
 };
+
+exports.transporter = transporter;
