@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../assets/styles/DetalleFactura.css';
 import html2pdf from 'html2pdf.js';
 import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export default function DetalleFactura() {
     const { id } = useParams();
@@ -29,6 +30,7 @@ export default function DetalleFactura() {
     const totalRetencion = baseImponible * retencion;
     const totalFinal = baseImponible + totalIVA - totalRetencion;
 
+    //Función para descargar el PDF
     const handleDownloadPDF = () => {
         const element = document.getElementById('factura-pdf');
         if (!element) return;

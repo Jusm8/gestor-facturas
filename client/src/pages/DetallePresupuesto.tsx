@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import '../assets/styles/DetallePresupuesto.css';
 import html2pdf from 'html2pdf.js';
 import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export default function DetallePresupuesto() {
   const { id } = useParams();
@@ -15,7 +16,7 @@ export default function DetallePresupuesto() {
 
     const clone = original.cloneNode(true) as HTMLElement;
 
-    // Inyectar estilos directamente
+    //Pongo los styles aqui para solucionar errores
     const style = document.createElement('style');
     style.textContent = `
     body {

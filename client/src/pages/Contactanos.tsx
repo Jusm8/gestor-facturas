@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../assets/styles/contacto.css'; // asegúrate de que esta ruta exista o ajústala
+import '../assets/styles/contacto.css';
 
 export default function Contactanos() {
     const [form, setForm] = useState({

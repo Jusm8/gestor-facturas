@@ -10,16 +10,16 @@ exports.register = async (req, res) => {
   const { nombre, email, password, rol } = req.body;
 
   try {
-    // Verificar si ya existe el email
+    //Verificar si ya existe el email
     const [existing] = await pool.query('SELECT idUsuario FROM Usuario WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(409).json({ error: 'El email ya está registrado.' });
     }
 
-    // Generar código de verificación
+    //Generar código de verificación
     const verificationCode = Math.floor(100000 + Math.random() * 900000);
 
-    // Guardar datos temporalmente en memoria global
+    //Guardar datos temporalmente en memoria global
     global.pendingUsers = global.pendingUsers || {};
     global.pendingUsers[email] = {
       nombre,
@@ -27,11 +27,11 @@ exports.register = async (req, res) => {
       password,
       rol,
       code: verificationCode,
-      //Aprox 10 minutos
+      //Aprox 10 minutos para que expire el codigo
       expiresAt: Date.now() + 10 * 60 * 1000
     };
 
-    // Enviar código por email
+    //Enviar código por email
     await sendVerificationEmail(email, verificationCode);
 
     res.status(200).json({ message: 'Código de verificación enviado al correo.' });
@@ -42,6 +42,7 @@ exports.register = async (req, res) => {
   }
 };
 
+//Verificacon por email
 exports.verifyCodeAndRegister = async (req, res) => {
   const { email, code } = req.body;
 
@@ -54,11 +55,13 @@ exports.verifyCodeAndRegister = async (req, res) => {
     return res.status(400).json({ error: 'Código incorrecto' });
   }
 
+  //Expirar codigo tras pasado un tiempo
   if (Date.now() > pending.expiresAt) {
     delete global.pendingUsers[email];
     return res.status(400).json({ error: 'El código ha expirado' });
   }
 
+  //Verificar la contraseña valida
   const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
 
   if (!passwordRegex.test(pending.password)) {
@@ -116,6 +119,7 @@ exports.login = async (req, res) => {
   }
 };
 
+//Limpiar fecha
 const cleanDate = (dateStr) => {
   if (!dateStr) return null;
   //Tiempo en modo YYYY-MM-DD
@@ -135,17 +139,6 @@ exports.updateProfile = async (req, res) => {
 
   //Si se sube una imagen, obtenemos la ruta generada por multer
   const imagen_url = req.file ? `/uploads/${req.file.filename}` : null;
-
-  //test
-  console.log({
-    nombre,
-    email,
-    imagen_url,
-    fecha_nacimiento,
-    sexo,
-    localidad,
-    idUsuario
-  });
 
   try {
     const clean = (value) => value === '' ? null : value;
@@ -183,6 +176,7 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
+//Crear proyecto para alamacenar los datos, clientes, productos, facturas y presupuestos
 exports.crearProyecto = async (req, res) => {
   const {
     nombre,
@@ -207,6 +201,7 @@ exports.crearProyecto = async (req, res) => {
   }
 };
 
+//Sacar los proyectos de un usuario
 exports.obtenerProyectosPorUsuario = async (req, res) => {
   const { idUsuario } = req.params;
 
@@ -223,41 +218,7 @@ exports.obtenerProyectosPorUsuario = async (req, res) => {
   }
 };
 
-//Presupuestos de un proyecto
-exports.getPresupuestosByProyecto = async (req, res) => {
-  try {
-    const [rows] = await pool.query(`
-      SELECT p.idPresupuesto, p.fecha, p.estado, c.nombre AS cliente
-      FROM Presupuesto p
-      JOIN Cliente c ON p.Cliente_idCliente = c.idCliente
-      WHERE p.Proyecto_idProyecto = ?
-    `, [req.params.id]);
-
-    res.json(rows);
-  } catch (error) {
-    console.error('Error al obtener presupuestos:', error);
-    res.status(500).json({ error: 'Error al obtener presupuestos' });
-  }
-};
-
-//Facturas de un proyecto
-exports.getFacturasByProyecto = async (req, res) => {
-  try {
-    const [rows] = await pool.query(`
-      SELECT f.idFactura, f.fecha, f.estado, c.nombre as cliente, fd.precio_unitario as descripcion
-      FROM Factura f
-      JOIN Cliente c ON f.Cliente_idCliente = c.idCliente
-      LEFT JOIN FacturaDetalle fd ON fd.Factura_idFactura = f.idFactura
-      WHERE f.Proyecto_idProyecto = ?
-    `, [req.params.id]);
-
-    res.json(rows);
-  } catch (error) {
-    console.error('Error al obtener facturas:', error);
-    res.status(500).json({ error: 'Error al obtener facturas' });
-  }
-};
-
+//Crear presupuesto
 exports.crearPresupuesto = async (req, res) => {
   const {
     fecha,
@@ -283,6 +244,7 @@ exports.crearPresupuesto = async (req, res) => {
 
     const presupuestoId = presupuestoRes.insertId;
 
+    //Creamos la variabl del total
     let total = 0;
 
     for (const detalle of detalles) {
@@ -300,6 +262,7 @@ exports.crearPresupuesto = async (req, res) => {
         [Producto_idProducto]
       );
 
+      //Calculamos el total de fomra automatica para el usuario
       total += cantidad * precio_unitario;
     }
 
@@ -330,6 +293,7 @@ exports.obtenerClientes = async (req, res) => {
   }
 };
 
+//Eliminar proyecto
 exports.eliminarProyecto = async (req, res) => {
   const id = req.params.id;
 
@@ -370,6 +334,7 @@ exports.eliminarProyecto = async (req, res) => {
   }
 };
 
+//Sacamos el proyecto por su id
 exports.obtenerProyectoById = async (req, res) => {
   const { id } = req.params;
 
@@ -387,6 +352,7 @@ exports.obtenerProyectoById = async (req, res) => {
   }
 };
 
+//Editar proyecto
 exports.editarProyecto = async (req, res) => {
   const { id } = req.params;
   const { nombre, descripcion, fecha_inicio, fecha_fin, estado } = req.body;
@@ -405,6 +371,7 @@ exports.editarProyecto = async (req, res) => {
   }
 };
 
+//Sacar los productos de un usuario
 exports.obtenerProductosPorUsuario = async (req, res) => {
   const { id } = req.params;
 
@@ -421,6 +388,7 @@ exports.obtenerProductosPorUsuario = async (req, res) => {
   }
 };
 
+//Cambiar la contraseña de un usuario usando su contraseña actual
 exports.changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   const token = req.headers.authorization?.split(' ')[1];
@@ -439,6 +407,7 @@ exports.changePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) return res.status(403).json({ error: 'Contraseña actual incorrecta' });
 
+    //Compruevo que la nueva contraseña cumple con los requisitos
     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
 
     if (!passwordRegex.test(newPassword)) {
@@ -455,6 +424,7 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+//Eliminar cuenta del usuario
 exports.deleteAccount = async (req, res) => {
   const { password } = req.body;
   const token = req.headers.authorization?.split(' ')[1];
@@ -512,6 +482,8 @@ exports.deleteAccount = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar la cuenta' });
   }
 };
+
+//Obtener usuarios
 exports.obtenerUsuarios = async (req, res) => {
   try {
     const [usuarios] = await pool.query('SELECT idUsuario AS id, nombre, email, rol FROM Usuario');
@@ -522,6 +494,7 @@ exports.obtenerUsuarios = async (req, res) => {
   }
 };
 
+//Obtener usuario por id
 exports.obtenerUsuarioById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -533,6 +506,7 @@ exports.obtenerUsuarioById = async (req, res) => {
   }
 };
 
+//Banear usuario cambiano el rol a baneado (Seguridad)
 exports.banUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -543,6 +517,7 @@ exports.banUser = async (req, res) => {
   }
 };
 
+//Desbanear usuario cambiando el rol a usuario (Seguridad)
 exports.unbanUser = async (req, res) => {
   const { email } = req.body;
 
@@ -567,30 +542,80 @@ exports.unbanUser = async (req, res) => {
   }
 };
 
+//Opcion de que el admin pueda eliminar un usuario
 exports.deleteUserByAdmin = async (req, res) => {
   const { id } = req.params;
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
 
-    await conn.query('DELETE FROM Producto WHERE Usuario_idUsuario = ?', [id]);
+    //Elimino detalles de presupuestos relacionados
+    await conn.query(`
+      DELETE FROM Producto_has_PresupuestoDetalle
+      WHERE PresupuestoDetalle_idPresupuestoDetalle IN (
+        SELECT idPresupuestoDetalle
+        FROM PresupuestoDetalle
+        WHERE Presupuesto_idPresupuesto IN (
+          SELECT idPresupuesto
+          FROM Presupuesto
+          WHERE Usuario_idUsuario = ?
+        )
+      )`, [id]);
+
+    await conn.query(`
+      DELETE FROM PresupuestoDetalle
+      WHERE Presupuesto_idPresupuesto IN (
+        SELECT idPresupuesto
+        FROM Presupuesto
+        WHERE Usuario_idUsuario = ?
+      )`, [id]);
+
+    //Eliminar presupuestos
+    await conn.query('DELETE FROM Presupuesto WHERE Usuario_idUsuario = ?', [id]);
+
+    //Eliminar facturas (detalle y principal) de los clientes de este usuario
+    await conn.query(`
+      DELETE FROM FacturaDetalle
+      WHERE Factura_idFactura IN (
+        SELECT idFactura
+        FROM Factura
+        WHERE Cliente_idCliente IN (
+          SELECT idCliente
+          FROM Cliente
+          WHERE Usuario_idUsuario = ?
+        )
+      )`, [id]);
+
+    await conn.query(`
+      DELETE FROM Factura
+      WHERE Cliente_idCliente IN (
+        SELECT idCliente
+        FROM Cliente
+        WHERE Usuario_idUsuario = ?
+      )`, [id]);
+
+    //Eliminar clientes, productos, proyectos y el propio usuario
     await conn.query('DELETE FROM Cliente WHERE Usuario_idUsuario = ?', [id]);
+    await conn.query('DELETE FROM Producto WHERE Usuario_idUsuario = ?', [id]);
     await conn.query('DELETE FROM Proyecto WHERE Usuario_idUsuario = ?', [id]);
     await conn.query('DELETE FROM Usuario WHERE idUsuario = ?', [id]);
 
     await conn.commit();
-    res.json({ message: 'Cuenta y datos eliminados' });
+    res.json({ message: 'Cuenta y datos eliminados correctamente' });
   } catch (error) {
     await conn.rollback();
-    res.status(500).json({ error: 'Error al eliminar cuenta' });
+    console.error('Error al eliminar usuario completo:', error);
+    res.status(500).json({ error: 'Error al eliminar cuenta', detalle: error.toString() });
   } finally {
     conn.release();
   }
 };
 
+//Recibir apelacion por email
 exports.recibirApelacion = async (req, res) => {
   const { email, mensaje } = req.body;
 
+  //Revisamos de que haya un mensaje
   if (!email || !mensaje) {
     return res.status(400).json({ error: 'Faltan datos obligatorios' });
   }
@@ -613,9 +638,11 @@ exports.recibirApelacion = async (req, res) => {
   }
 };
 
+//Recibir comentario de los usuarios
 exports.recibirContacto = async (req, res) => {
   const { nombre, email, mensaje } = req.body;
 
+  //Revisamos de que haya un mensaje
   if (!nombre || !email || !mensaje) {
     return res.status(400).json({ error: 'Faltan datos obligatorios' });
   }

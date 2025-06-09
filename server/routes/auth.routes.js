@@ -38,7 +38,6 @@ router.delete('/admin/delete/:id', authController.deleteUserByAdmin);
 
 //Baneos
 router.post('/ban-appeal', authController.recibirApelacion);
-
 router.get('/usuarios/:id', authController.obtenerUsuarioById);
 
 //Proyectos

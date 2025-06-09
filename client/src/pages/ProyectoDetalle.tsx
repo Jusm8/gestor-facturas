@@ -3,10 +3,9 @@ import { useParams } from 'react-router-dom';
 import '../assets/styles/ProyectoDetalle.css';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess, showError, showConfirm } from '../components/alert';
-import html2pdf from 'html2pdf.js';
 
 export default function ProyectoDetalle() {
-    const { id } = useParams();
+    const { id, idProyecto } = useParams();
     const navigate = useNavigate();
 
     interface Presupuesto {
@@ -109,87 +108,6 @@ export default function ProyectoDetalle() {
         }
 
     };
-    //Función para descargar el PDF
-    const handleDescargarDocumento = async (tipo: 'factura' | 'presupuesto', idDoc: number) => {
-        const token = localStorage.getItem('token');
-
-        try {
-            const res = await fetch(`http://localhost:3001/api/documento/${tipo}/${idDoc}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-
-            const container = document.createElement('div');
-            container.style.padding = '2rem';
-            container.style.fontFamily = 'Arial, sans-serif';
-
-            const isFactura = tipo === 'factura';
-
-            const baseImponible = data.detalles.reduce((acc: number, d: any) => acc + d.cantidad * d.precio_unitario, 0);
-            const iva = isFactura ? baseImponible * (parseFloat(data.iva) / 100) : 0;
-            const retencion = isFactura ? baseImponible * (parseFloat(data.retencion) / 100) : 0;
-            const totalFinal = baseImponible + iva - retencion;
-
-            container.innerHTML = `
-                <h2 style="color: #00a6e0; text-align: center;">SIMPLIFAC</h2>
-                <h3 style="text-align: center;">${tipo.toUpperCase()}</h3>
-
-                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                    <div>
-                        <p><strong>Cliente:</strong> ${data.cliente_nombre}</p>
-                            ${isFactura ? `<p><strong>CIF/NIF:</strong> ${data.cliente_nif || ''}</p>` : ''}
-                    </div>
-                    <div>
-                        ${isFactura ? `<p><strong>Número de factura:</strong> ${data.idFactura || '-'}</p>` : ''}
-                        <p><strong>Fecha:</strong> ${new Date(data.fecha).toLocaleDateString()}</p>
-                    </div>
-                </div>
-
-                <table border="1" cellspacing="0" cellpadding="8" style="width: 100%; border-collapse: collapse; font-size: 12px;">
-                    <thead style="background: #00a6e0; color: white;">
-                        <tr>
-                            <th>${isFactura ? 'Concepto' : 'Descripción'}</th>
-                            <th>${isFactura ? 'Cantidad x Base' : 'Cantidad'}</th>
-                            <th>Total</th>
-                            ${isFactura ? '<th>I.V.A</th>' : ''}
-                        </tr>
-                    </thead>
-                <tbody>
-                    ${data.detalles.map((d: any) => `
-                        <tr>
-                            <td>${d.descripcion}</td>
-                            <td>${isFactura ? `${d.cantidad} x ${parseFloat(d.precio_unitario).toFixed(2)}€` : d.cantidad}</td>
-                            <td>${(d.cantidad * d.precio_unitario).toFixed(2)}€</td>
-                            ${isFactura ? `<td>${data.iva || 0}%</td>` : ''}
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-
-            <div style="text-align: right; margin-top: 1rem; font-size: 13px;">
-                ${isFactura ? `
-                    <p><strong>Base imponible:</strong> ${baseImponible.toFixed(2)}€</p>
-                    <p><strong>I.V.A:</strong> ${iva.toFixed(2)}€</p>
-                    <p><strong>Retención:</strong> -${retencion.toFixed(2)}€</p>
-                ` : ''}
-                    <p style="font-size: 16px; font-weight: bold; margin-top: 0.5rem;">
-                        TOTAL: <span style="color: #0077cc">${totalFinal.toFixed(2)}€</span>
-                    </p>
-            </div>
-            `;
-
-            html2pdf().set({
-                margin: 0.5,
-                filename: `${tipo}_${idDoc}.pdf`,
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            }).from(container).save();
-
-        } catch (error) {
-            console.error('Error generando PDF:', error);
-            showError('Error', 'No se pudo generar el PDF');
-        }
-    };
 
     const { presupuestos: presupuestosFiltrados, facturas: facturasFiltradas } = aplicarFiltros();
 
@@ -290,7 +208,6 @@ export default function ProyectoDetalle() {
                                 <td className='acciones-celda'>
                                     <button title="Editar" onClick={() => navigate(`/documento/${doc.tipo}/editar/${doc.idFactura || doc.idPresupuesto}`)}>✏️</button>
                                     <button title="Eliminar" onClick={() => handleEliminar(doc.tipo, doc.idFactura || doc.idPresupuesto)}>🗑️</button>
-                                    <button title="Descargar" onClick={() => handleDescargarDocumento(doc.tipo, doc.idFactura || doc.idPresupuesto)}>⬇️</button>
                                 </td>
                             </tr>
                         ))}
