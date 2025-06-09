@@ -1,0 +1,39 @@
+.sobre-container {
+  background: linear-gradient(to right, #4a148c, #880e4f);
+  color: white;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.sobre-card {
+  background-color: white;
+  color: #333;
+  max-width: 800px;
+  width: 100%;
+  border-radius: 10px;
+  padding: 2.5rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.sobre-card h1 {
+  margin-bottom: 1rem;
+  color: #880e4f;
+  font-size: 2.2rem;
+}
+
+.sobre-card h2 {
+  margin-top: 2rem;
+  color: #4a148c;
+}
+
+.sobre-card ul {
+  margin-top: 1rem;
+  padding-left: 1.5rem;
+}
+
+.sobre-card li {
+  margin-bottom: 0.5rem;
+}

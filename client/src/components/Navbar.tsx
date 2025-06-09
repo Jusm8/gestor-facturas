@@ -37,7 +37,8 @@ export default function Navbar() {
         {user?.rol === 'admin' && (
           <span onClick={() => navigate('/resumen')}>Administración</span>
         )}
-        <span>More</span>
+        <span onClick={() => navigate('/contactanos')}>Contáctanos</span>
+        <span onClick={() => navigate('/sobre-nosotros')}>Sobre Nosotros</span>
       </div>
       <div className="navbar-right">
         <span className="usuario" onClick={() => navigate('/perfil')}>

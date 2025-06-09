@@ -55,4 +55,7 @@ router.get('/clientes/:id', authController.obtenerClientes);
 //Productos
 router.get('/productos/:id', authController.obtenerProductosPorUsuario);
 
+//Contacto
+router.post('/contacto', authController.recibirContacto);
+
 module.exports = router;

@@ -612,3 +612,27 @@ exports.recibirApelacion = async (req, res) => {
     res.status(500).json({ error: 'No se pudo enviar el mensaje', detalle: error.toString() });
   }
 };
+
+exports.recibirContacto = async (req, res) => {
+  const { nombre, email, mensaje } = req.body;
+
+  if (!nombre || !email || !mensaje) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  try {
+    const { transporter } = require('../utils/mail');
+
+    await transporter.sendMail({
+      from: `"Formulario de Contacto" <${process.env.EMAIL_FROM}>`,
+      to: process.env.EMAIL_FROM,
+      subject: `Mensaje de contacto de ${nombre} (${email})`,
+      text: mensaje
+    });
+
+    res.status(200).json({ message: 'Mensaje enviado con éxito' });
+  } catch (error) {
+    console.error('Error al enviar mensaje de contacto:', error);
+    res.status(500).json({ error: 'No se pudo enviar el mensaje', detalle: error.toString() });
+  }
+};

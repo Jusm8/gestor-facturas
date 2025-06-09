@@ -7,6 +7,8 @@ import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, Proyecto
 import AdminRoute from './components/AdminRoute';
 import BannedPage from './pages/BannedPage';
 import CheckBanRedirect from './components/CheckBanRedirect';
+import Contactanos from './pages/Contactanos';
+import SobreNosotros from './pages/SobreNosotros';
 
 const rootElement = document.getElementById('root');
 
@@ -40,6 +42,8 @@ if (rootElement) {
             <Route path="/productos/editar/:id" element={<ProtectedRoute><FormularioProducto /></ProtectedRoute>} />
             <Route path="/resumen" element={<AdminRoute><AdminView /></AdminRoute>} />
             <Route path="/baneado" element={<BannedPage />} />
+            <Route path="/contactanos" element={<Contactanos />} />
+            <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
