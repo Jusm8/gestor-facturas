@@ -31,7 +31,7 @@ export default function AdminView() {
 
   //Cargar usuarios
   const cargarUsuarios = () => {
-    fetch('http://localhost:3001/api/auth/usuarios')
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuarios`)
       .then(res => res.json())
       .then(data => setUsuarios(data))
       .catch(err => console.error('Error cargando usuarios:', err));
@@ -54,7 +54,7 @@ export default function AdminView() {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:3001/api/documento/resumen/${selectedUserId}`)
+    fetch(`${import.meta.env.VITE_API_URL}/api/documento/resumen/${selectedUserId}`)
       .then(res => {
         if (!res.ok) throw new Error('Error al obtener documentos');
         return res.json();
@@ -74,7 +74,7 @@ export default function AdminView() {
 
   //Acciones admin
   const handleBan = async () => {
-    await fetch(`http://localhost:3001/api/auth/admin/ban/${selectedUser?.id}`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin/ban/${selectedUser?.id}`, {
       method: 'PUT',
     });
     showSuccess('Usuario baneado', 'El usuario ha sido baneado');
@@ -83,7 +83,7 @@ export default function AdminView() {
   };
 
   const handleUnban = async () => {
-    await fetch('http://localhost:3001/api/auth/admin/unban', {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin/unban`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: selectedUser?.email })
@@ -96,7 +96,7 @@ export default function AdminView() {
   const handleDelete = async () => {
     if (!window.confirm('¿Seguro que deseas eliminar esta cuenta permanentemente?')) return;
 
-    await fetch(`http://localhost:3001/api/auth/admin/delete/${selectedUserId}`, {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin/delete/${selectedUserId}`, {
       method: 'DELETE'
     });
     showConfirm('Usuario eliminado');

@@ -12,7 +12,7 @@ export default function CheckBanRedirect() {
       if (!user) return;
 
       try {
-        const res = await fetch(`http://localhost:3001/api/auth/usuarios/${user.id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/usuarios/${user.id}`);
         const updated = await res.json();
 
         if (updated.rol === 'baneado') {

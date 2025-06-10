@@ -8,7 +8,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static('uploads'));
 
 app.use('/api/auth', require('./routes/auth.routes'));
@@ -19,6 +18,6 @@ app.use('/api/gestion', require('./routes/gestion.routes'));
 
 app.use('/api/auth', require('./routes/auth.routes'));
 
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor backend en http://localhost:${process.env.PORT}`);
+app.listen(process.env.PORT, '0.0.0.0', () => {
+  console.log(`Servidor backend en http://0.0.0.0:${process.env.PORT}`);
 });

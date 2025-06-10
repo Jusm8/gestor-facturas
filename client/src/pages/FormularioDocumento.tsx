@@ -48,7 +48,7 @@ export default function FormularioDocumento() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}/proyecto/${proyectoId}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/gestion/productos/usuario/${user.id}/proyecto/${proyectoId}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -57,7 +57,7 @@ export default function FormularioDocumento() {
       })
       .catch(console.error);
 
-    fetch(`http://localhost:3001/api/auth/clientes/${user.id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/clientes/${user.id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -67,7 +67,7 @@ export default function FormularioDocumento() {
       .catch(console.error);
 
     if (modoEdicion && tipo && id) {
-      fetch(`http://localhost:3001/api/documento/${tipo}/${id}`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/documento/${tipo}/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -191,8 +191,8 @@ export default function FormularioDocumento() {
     }
 
     const url = modoEdicion
-      ? `http://localhost:3001/api/documento/${documentoTipo}/${id}`
-      : `http://localhost:3001/api/documento/${documentoTipo}`;
+      ? `${import.meta.env.VITE_API_URL}/api/documento/${documentoTipo}/${id}`
+      : `${import.meta.env.VITE_API_URL}/api/documento/${documentoTipo}`;
 
     try {
       const res = await fetch(url, {

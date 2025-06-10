@@ -35,10 +35,10 @@ export default function ProyectoDetalle() {
         const fetchData = async () => {
             try {
                 const [presupuestoRes, facturaRes] = await Promise.all([
-                    fetch(`http://localhost:3001/api/documento/presupuestos/${id}`, {
+                    fetch(`${import.meta.env.VITE_API_URL}/api/documento/presupuestos/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
-                    fetch(`http://localhost:3001/api/documento/facturas/${id}`, {
+                    fetch(`${import.meta.env.VITE_API_URL}/api/documento/facturas/${id}`, {
                         headers: { Authorization: `Bearer ${token}` },
                     }),
                 ]);
@@ -87,7 +87,7 @@ export default function ProyectoDetalle() {
         if (!confirm) return;
 
         try {
-            const res = await fetch(`http://localhost:3001/api/documento/${tipo}/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/documento/${tipo}/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`

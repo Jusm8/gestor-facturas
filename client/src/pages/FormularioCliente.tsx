@@ -20,7 +20,7 @@ export default function FormularioCliente() {
             const cargarCliente = async () => {
                 const token = localStorage.getItem('token');
                 try {
-                    const res = await fetch(`http://localhost:3001/api/gestion/clientes/${id}`, {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/clientes/${id}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     const data = await res.json();
@@ -53,7 +53,7 @@ export default function FormularioCliente() {
         const proyectoActual = localStorage.getItem('proyectoActual');
 
         try {
-            const res = await fetch(`http://localhost:3001/api/gestion/clientes${esEdicion ? '/' + id : ''}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/clientes${esEdicion ? '/' + id : ''}`, {
                 method: esEdicion ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',

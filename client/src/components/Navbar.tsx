@@ -49,7 +49,7 @@ export default function Navbar() {
           <img
             src={
               user.imagen_url.startsWith('/uploads/')
-                ? `http://localhost:3001${user.imagen_url}`
+                ? `${import.meta.env.VITE_API_URL}${user.imagen_url}`
                 : user.imagen_url
             }
             alt="Perfil"

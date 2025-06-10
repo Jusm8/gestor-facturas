@@ -102,7 +102,7 @@ export default function Profile() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/update', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/update`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`
@@ -155,7 +155,7 @@ export default function Profile() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/change-password', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ export default function Profile() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/auth/delete-account', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/delete-account`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -270,7 +270,7 @@ export default function Profile() {
           {form.imagen_url ? (
             <img src={
               form.imagen_url.startsWith('/uploads/')
-                ? `http://localhost:3001${form.imagen_url}`
+                ? `${import.meta.env.VITE_API_URL}${form.imagen_url}`
                 : form.imagen_url
             } alt="Perfil" />
           ) : (

@@ -12,7 +12,7 @@ export default function DetalleFactura() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        fetch(`http://localhost:3001/api/documento/factura/${id}`, {
+        fetch(`${import.meta.env.VITE_API_URL}/api/documento/factura/${id}`, {
             headers: { Authorization: `Bearer ${token}` }
         })
             .then(res => res.json())

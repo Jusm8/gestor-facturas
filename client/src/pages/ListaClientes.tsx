@@ -25,7 +25,7 @@ export default function ListaClientes() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/clientes/usuario/${user.id}/proyecto/${idProyecto}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/clientes/usuario/${user.id}/proyecto/${idProyecto}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -58,7 +58,7 @@ export default function ListaClientes() {
     if (!confirmado) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/clientes/${idCliente}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}1/api/gestion/clientes/${idCliente}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

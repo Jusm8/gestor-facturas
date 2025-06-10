@@ -22,7 +22,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,7 +51,7 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/verify', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -78,6 +78,16 @@ export default function Register() {
 
   return (
     <div className="login-container">
+      <div className="login-info-panel">
+        <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
+        <h2>Bienvenido a SimpliFac</h2>
+        <p>Gestiona tus facturas y presupuestos de forma sencilla y eficiente.</p>
+        <ul>
+          <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos.</li>
+          <li>Añade a sus clientes y sus productos para crear de forma rapida y clara su propia factura.</li>
+          <li>Previsualize su factura y presupuestos para ver como quedara antes de descargarlo.</li>
+        </ul>
+      </div>
       <div className="login-card">
         {step === 'form' ? (
           <>

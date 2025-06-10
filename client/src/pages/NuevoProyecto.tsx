@@ -20,7 +20,7 @@ export default function NuevoProyecto() {
     if (!modoEdicion) return;
 
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:3001/api/auth/proyectos/${id}/editar`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/auth/proyectos/${id}/editar`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -50,8 +50,8 @@ export default function NuevoProyecto() {
 
     const payload = { ...form, Usuario_idUsuario: user.id };
     const url = modoEdicion
-      ? `http://localhost:3001/api/auth/proyectos/${id}`
-      : `http://localhost:3001/api/auth/proyecto`;
+      ? `${import.meta.env.VITE_API_URL}/api/auth/proyectos/${id}`
+      : `${import.meta.env.VITE_API_URL}/api/auth/proyecto`;
 
     const method = modoEdicion ? 'PUT' : 'POST';
 

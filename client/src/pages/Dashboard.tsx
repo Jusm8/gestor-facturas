@@ -11,7 +11,7 @@ const Dashboard = () => {
     const fetchNombreProyecto = async () => {
       const token = localStorage.getItem('token');
       try {
-        const res = await fetch(`http://localhost:3001/api/auth/proyectos/${idProyecto}/editar`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/proyectos/${idProyecto}/editar`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();

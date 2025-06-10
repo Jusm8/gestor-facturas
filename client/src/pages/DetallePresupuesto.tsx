@@ -75,7 +75,7 @@ export default function DetallePresupuesto() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    fetch(`http://localhost:3001/api/documento/presupuesto/${id}`, {
+    fetch(`${import.meta.env.VITE_API_URL}/api/documento/presupuesto/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())

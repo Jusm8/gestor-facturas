@@ -25,7 +25,7 @@ export default function ListaProductos() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}/proyecto/${idProyecto}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/productos/usuario/${user.id}/proyecto/${idProyecto}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -65,7 +65,7 @@ export default function ListaProductos() {
     if (!confirmado) return;
 
     try {
-      const res = await fetch(`http://localhost:3001/api/gestion/productos/${idProducto}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/productos/${idProducto}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

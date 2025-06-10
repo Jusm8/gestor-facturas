@@ -16,7 +16,7 @@ export default function Contactanos() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const res = await fetch('http://localhost:3001/api/auth/contacto', {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/contacto`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(form)

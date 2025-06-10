@@ -21,7 +21,7 @@ export default function FormularioProducto() {
         if (esEdicion && id) {
             const cargarProducto = async () => {
                 try {
-                    const res = await fetch(`http://localhost:3001/api/gestion/productos/${id}`, {
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/productos/${id}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
 
@@ -56,7 +56,7 @@ export default function FormularioProducto() {
         const proyectoActual = localStorage.getItem('proyectoActual');
 
         try {
-            const res = await fetch(`http://localhost:3001/api/gestion/productos${esEdicion ? '/' + id : ''}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gestion/productos${esEdicion ? '/' + id : ''}`, {
                 method: esEdicion ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',

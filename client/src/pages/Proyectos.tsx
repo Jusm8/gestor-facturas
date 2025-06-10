@@ -14,7 +14,7 @@ export default function Proyectos() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     try {
-      const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/proyectos/usuario/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -62,7 +62,7 @@ export default function Proyectos() {
         try {
           const token = localStorage.getItem('token');
           const user = JSON.parse(localStorage.getItem('user') || '{}');
-          const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`, {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/proyectos/usuario/${user.id}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,
