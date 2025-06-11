@@ -140,3 +140,56 @@ exports.eliminarProducto = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar producto' });
   }
 };
+
+exports.duplicarCliente = async (req, res) => {
+  const { idClienteOrigen, idProyectoDestino } = req.body;
+
+  try {
+    const [[cliente]] = await db.query('SELECT * FROM Cliente WHERE idCliente = ?', [idClienteOrigen]);
+    if (!cliente) return res.status(404).json({ error: 'Cliente no encontrado' });
+
+    const [resultado] = await db.query(
+      'INSERT INTO Cliente (nombre, email, nif, direccion, telefono, Usuario_idUsuario, Proyecto_idProyecto) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [
+        cliente.nombre,
+        cliente.email,
+        cliente.nif,
+        cliente.direccion,
+        cliente.telefono,
+        cliente.Usuario_idUsuario,
+        idProyectoDestino
+      ]
+    );
+
+    res.status(201).json({ message: 'Cliente duplicado', idNuevoCliente: resultado.insertId });
+  } catch (error) {
+    console.error('Error al duplicar cliente:', error);
+    res.status(500).json({ error: 'Error al duplicar cliente' });
+  }
+};
+
+exports.duplicarProducto = async (req, res) => {
+  const { idProductoOrigen, idProyectoDestino } = req.body;
+
+  try {
+    const [[producto]] = await db.query('SELECT * FROM Producto WHERE idProducto = ?', [idProductoOrigen]);
+    if (!producto) return res.status(404).json({ error: 'Producto no encontrado' });
+
+    const [resultado] = await db.query(
+      'INSERT INTO Producto (nombre, tipo, precio, descripcion, Usuario_idUsuario, Proyecto_idProyecto) VALUES (?, ?, ?, ?, ?, ?)',
+      [
+        producto.nombre,
+        producto.tipo,
+        producto.precio,
+        producto.descripcion,
+        producto.Usuario_idUsuario,
+        idProyectoDestino
+      ]
+    );
+
+    res.status(201).json({ message: 'Producto duplicado', idNuevoProducto: resultado.insertId });
+  } catch (error) {
+    console.error('Error al duplicar producto:', error);
+    res.status(500).json({ error: 'Error al duplicar producto' });
+  }
+};

@@ -16,6 +16,11 @@ export default function ListaProductos() {
   const [busqueda, setBusqueda] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [mostrarImportador, setMostrarImportador] = useState(false);
+  const [proyectosDisponibles, setProyectosDisponibles] = useState<any[]>([]);
+  const [proyectoOrigen, setProyectoOrigen] = useState<string>('');
+  const [productosOrigen, setProductosOrigen] = useState<Producto[]>([]);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
 
   const params = useParams();
   const idProyecto = params.idProyecto || localStorage.getItem('proyectoActual');
@@ -53,6 +58,19 @@ export default function ListaProductos() {
   const productosFiltrados = productos.filter(p =>
     p.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
+  const cargarProyectos = async () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`);
+    const data = await res.json();
+    setProyectosDisponibles(data);
+  };
+
+  const cargarProductosOrigen = async (idProyecto: string) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const res = await fetch(`http://localhost:3001/api/gestion/productos/usuario/${user.id}/proyecto/${idProyecto}`);
+    const data = await res.json();
+    setProductosOrigen(data);
+  };
 
   const handleEliminarProducto = async (idProducto: number) => {
     const token = localStorage.getItem('token');
@@ -101,6 +119,14 @@ export default function ListaProductos() {
           className="producto-buscador"
         />
         <button onClick={() => navigate('/productos/nuevo')}>+ Nuevo Producto</button>
+        <button
+          onClick={() => {
+            cargarProyectos();
+            setMostrarImportador(true);
+          }}
+        >
+          📥 Importar desde otro proyecto
+        </button>
       </div>
 
       {error && <p className="error-producto">{error}</p>}
@@ -127,6 +153,75 @@ export default function ListaProductos() {
             </div>
 
           ))}
+        </div>
+      )}
+      {mostrarImportador && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Importar productos</h2>
+
+            <label>Selecciona un proyecto:</label>
+            <select
+              value={proyectoOrigen}
+              onChange={(e) => {
+                setProyectoOrigen(e.target.value);
+                cargarProductosOrigen(e.target.value);
+              }}
+            >
+              <option value="">-- Elegir proyecto --</option>
+              {proyectosDisponibles.map(p => (
+                <option key={p.idProyecto} value={p.idProyecto}>{p.nombre}</option>
+              ))}
+            </select>
+
+            <div className="cliente-lista-importar">
+              {productosOrigen.map(producto => (
+                <div key={producto.idProducto}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={seleccionados.includes(producto.idProducto)}
+                      onChange={() => {
+                        setSeleccionados(prev =>
+                          prev.includes(producto.idProducto)
+                            ? prev.filter(id => id !== producto.idProducto)
+                            : [...prev, producto.idProducto]
+                        );
+                      }}
+                    />
+                    {producto.nombre} - {producto.tipo}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className="modal-acciones">
+              <button
+                onClick={async () => {
+                  const token = localStorage.getItem('token');
+                  const destino = parseInt(idProyecto || '');
+
+                  for (const idProductoOrigen of seleccionados) {
+                    await fetch('http://localhost:3001/api/gestion/productos/duplicar', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                      },
+                      body: JSON.stringify({ idProductoOrigen, idProyectoDestino: destino })
+                    });
+                  }
+
+                  await showSuccess('Importado', 'Productos importados correctamente');
+                  setMostrarImportador(false);
+                  cargarProductos();
+                }}
+              >
+                Importar seleccionados
+              </button>
+              <button onClick={() => setMostrarImportador(false)}>Cancelar</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

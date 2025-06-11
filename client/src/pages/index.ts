@@ -13,3 +13,6 @@ export { default as FormularioCliente } from './FormularioCliente';
 export { default as ListaProductos } from './ListaProductos';
 export { default as FormularioProducto } from './FormularioProducto';
 export { default as AdminView } from './AdminView';
+export { default as BannedPage } from './BannedPage';
+export { default as Contactanos } from './Contactanos';
+export { default as SobreNosotros } from './SobreNosotros';

@@ -9,7 +9,7 @@ export default function CheckBanRedirect() {
 
   useEffect(() => {
     const validateUser = async () => {
-      if (!user) return;
+      if (!user || location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/logout') return;
 
       try {
         const res = await fetch(`http://localhost:3001/api/auth/usuarios/${user.id}`);
@@ -18,7 +18,9 @@ export default function CheckBanRedirect() {
         if (updated.rol === 'baneado') {
           localStorage.setItem('user', JSON.stringify(updated));
           setUser(updated);
-          if (location.pathname !== '/baneado') {
+
+          //El usuario baneado solo puede o quedarse en esa vista o deslogearse
+          if (location.pathname !== '/baneado' && location.pathname !== '/logout') {
             navigate('/baneado');
           }
         }

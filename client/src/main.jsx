@@ -2,13 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { Navbar, ProtectedRoute } from './components';
-import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto, AdminView } from './pages';
-import AdminRoute from './components/AdminRoute';
-import BannedPage from './pages/BannedPage';
-import CheckBanRedirect from './components/CheckBanRedirect';
-import Contactanos from './pages/Contactanos';
-import SobreNosotros from './pages/SobreNosotros';
+import { Navbar, ProtectedRoute, AdminRoute, LogoutHandler, CheckBanRedirect } from './components';
+import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto, AdminView, BannedPage, Contactanos, SobreNosotros  } from './pages';
 
 const rootElement = document.getElementById('root');
 
@@ -44,6 +39,7 @@ if (rootElement) {
             <Route path="/baneado" element={<BannedPage />} />
             <Route path="/contactanos" element={<Contactanos />} />
             <Route path="/sobre-nosotros" element={<SobreNosotros />} />
+            <Route path="/logout" element={<LogoutHandler />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

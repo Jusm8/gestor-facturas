@@ -11,6 +11,7 @@ export default function Navbar() {
 
   //logout
   const handleLogout = () => {
+    //Mensaje de prevencion de que se cierre la sesion
     Swal.fire({
       title: '¿Cerrar sesión?',
       text: '¿Estás seguro de que quieres cerrar sesión?',
@@ -21,10 +22,7 @@ export default function Navbar() {
       confirmButtonColor: '#d33'
     }).then(result => {
       if (result.isConfirmed) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        navigate('/login');
+        window.location.href = '/logout';
       }
     });
   };
@@ -63,7 +61,6 @@ export default function Navbar() {
         )}
         <button className="logout-btn" onClick={handleLogout}>Cerrar sesión</button>
       </div>
-
     </nav>
   );
 }

@@ -17,6 +17,11 @@ export default function ListaClientes() {
   const [busqueda, setBusqueda] = useState('');
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const [mostrarImportador, setMostrarImportador] = useState(false);
+  const [proyectosDisponibles, setProyectosDisponibles] = useState<any[]>([]);
+  const [proyectoOrigen, setProyectoOrigen] = useState<string>('');
+  const [clientesOrigen, setClientesOrigen] = useState<Cliente[]>([]);
+  const [seleccionados, setSeleccionados] = useState<number[]>([]);
 
   const idProyecto = localStorage.getItem('proyectoActual');
 
@@ -46,6 +51,23 @@ export default function ListaClientes() {
       setClientes([]);
     }
   };
+
+  //Función para cargar los proyectos
+  const cargarProyectos = async () => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`);
+    const data = await res.json();
+    setProyectosDisponibles(data);
+  };
+
+  //Cargar clientes del proyecto seleccionado
+  const cargarClientesOrigen = async (idProyecto: string) => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const res = await fetch(`http://localhost:3001/api/gestion/clientes/usuario/${user.id}/proyecto/${idProyecto}`);
+    const data = await res.json();
+    setClientesOrigen(data);
+  };
+
 
   const handleEliminarCliente = async (idCliente: number) => {
     const token = localStorage.getItem('token');
@@ -104,6 +126,10 @@ export default function ListaClientes() {
           className="cliente-buscador"
         />
         <button onClick={() => navigate('/clientes/nuevo')}>+ Nuevo Cliente</button>
+        <button onClick={() => {
+          cargarProyectos();
+          setMostrarImportador(true);
+        }}>📥 Importar desde otro proyecto</button>
       </div>
 
       {error && <p className="error-cliente">{error}</p>}
@@ -133,6 +159,76 @@ export default function ListaClientes() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {mostrarImportador && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Importar clientes</h2>
+
+            <label>Selecciona un proyecto:</label>
+            <select
+              value={proyectoOrigen}
+              onChange={(e) => {
+                setProyectoOrigen(e.target.value);
+                cargarClientesOrigen(e.target.value);
+              }}
+            >
+              <option value="">-- Elegir proyecto --</option>
+              {proyectosDisponibles.map(p => (
+                <option key={p.idProyecto} value={p.idProyecto}>{p.nombre}</option>
+              ))}
+            </select>
+
+            <div className="cliente-lista-importar">
+              {clientesOrigen.map(cliente => (
+                <div key={cliente.idCliente}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={seleccionados.includes(cliente.idCliente)}
+                      onChange={() => {
+                        setSeleccionados(prev =>
+                          prev.includes(cliente.idCliente)
+                            ? prev.filter(id => id !== cliente.idCliente)
+                            : [...prev, cliente.idCliente]
+                        );
+                      }}
+                    />
+                    {cliente.nombre} - {cliente.email}
+                  </label>
+                </div>
+              ))}
+            </div>
+
+            <div className="modal-acciones">
+              <button
+                onClick={async () => {
+                  const token = localStorage.getItem('token');
+                  const user = JSON.parse(localStorage.getItem('user') || '{}');
+                  const destino = parseInt(idProyecto || '');
+
+                  for (const idClienteOrigen of seleccionados) {
+                    await fetch('http://localhost:3001/api/gestion/clientes/duplicar', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                      },
+                      body: JSON.stringify({ idClienteOrigen, idProyectoDestino: destino })
+                    });
+                  }
+
+                  await showSuccess('Importado', 'Clientes importados correctamente');
+                  setMostrarImportador(false);
+                  cargarClientes();
+                }}
+              >
+                Importar seleccionados
+              </button>
+              <button onClick={() => setMostrarImportador(false)}>Cancelar</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

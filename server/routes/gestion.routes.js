@@ -8,6 +8,7 @@ router.post('/clientes', gestionController.crearCliente);
 router.get('/clientes/:id', gestionController.obtenerClienteById);
 router.put('/clientes/:id', gestionController.actualizarCliente);
 router.delete('/clientes/:id', gestionController.eliminarCliente);
+router.post('/clientes/duplicar', gestionController.duplicarCliente);
 
 //PRODUCTOS
 router.get('/productos/usuario/:idUsuario/proyecto/:idProyecto', gestionController.obtenerProductos);
@@ -15,5 +16,6 @@ router.get('/productos/:id', gestionController.obtenerProductoById);
 router.post('/productos', gestionController.crearProducto);
 router.put('/productos/:id', gestionController.actualizarProducto);
 router.delete('/productos/:id', gestionController.eliminarProducto);
+router.post('/productos/duplicar', gestionController.duplicarProducto);
 
 module.exports = router;
