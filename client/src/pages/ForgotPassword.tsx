@@ -56,14 +56,16 @@ export default function ForgotPassword() {
   return (
     <div className="login-container">
       <div className="login-info-panel">
-        <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
-        <h2>¿Problemas para acceder?</h2>
-        <p>Recupera tu cuenta en 3 simples pasos:</p>
-        <ul>
-          <li>Ingresa tu correo</li>
-          <li>Verifica el código</li>
-          <li>Establece una nueva contraseña segura</li>
-        </ul>
+        <div className='login-info-content'>
+          <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
+          <h2>¿Problemas para acceder?</h2>
+          <p>Recupera tu cuenta en 3 simples pasos:</p>
+          <ul>
+            <li>Ingresa tu correo</li>
+            <li>Verifica el código</li>
+            <li>Establece una nueva contraseña segura</li>
+          </ul>
+        </div>
       </div>
 
       <div className="login-card">
