@@ -28,8 +28,14 @@ router.put('/update', upload.single('imagen'), authController.updateProfile);
 router.post('/verify', authController.verifyCodeAndRegister);
 //Ruta para cambiar la contraseña
 router.put('/change-password', authController.changePassword);
+//Cambiar contraseña por email
+router.post('/forgot-password', authController.enviarCodigoReset);
+router.post('/verify-reset-code', authController.verificarCodigoReset);
+router.put('/reset-password', authController.restablecerPassword);
+
 //Borrar cuenta
 router.delete('/delete-account', authController.deleteAccount);
+
 //Rutas para opciones Admin
 router.get('/usuarios', authController.obtenerUsuarios);
 router.put('/admin/ban/:id', authController.banUser);

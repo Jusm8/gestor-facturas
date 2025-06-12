@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { Navbar, ProtectedRoute, AdminRoute, LogoutHandler, CheckBanRedirect } from './components';
-import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto, AdminView, BannedPage, Contactanos, SobreNosotros  } from './pages';
+import { Login, Register, Dashboard, Profile, Proyectos, NuevoProyecto, ProyectoDetalle, FormularioDocumento, ListaProductos, DetallePresupuesto, DetalleFactura, ListaClientes, FormularioCliente, FormularioProducto, AdminView, BannedPage, Contactanos, SobreNosotros, ForgotPassword } from './pages';
 
 const rootElement = document.getElementById('root');
 
@@ -40,6 +40,7 @@ if (rootElement) {
             <Route path="/contactanos" element={<Contactanos />} />
             <Route path="/sobre-nosotros" element={<SobreNosotros />} />
             <Route path="/logout" element={<LogoutHandler />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

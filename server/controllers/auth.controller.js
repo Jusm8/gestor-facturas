@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('../db');
-const { ImGift } = require('react-icons/im');
-const { sendVerificationEmail } = require('../utils/mail');
+const { sendRegistrationEmail } = require('../utils/mail');
 const nodemailer = require('nodemailer');
 
 //Registro de usuario
@@ -32,7 +31,7 @@ exports.register = async (req, res) => {
     };
 
     //Enviar código por email
-    await sendVerificationEmail(email, verificationCode);
+    await sendRegistrationEmail(email, verificationCode);
 
     res.status(200).json({ message: 'Código de verificación enviado al correo.' });
 
@@ -621,7 +620,7 @@ exports.recibirApelacion = async (req, res) => {
   }
 
   try {
-    const { sendVerificationEmail } = require('../utils/mail');
+    const { sendRegistrationEmail } = require('../utils/mail');
     const transporter = require('../utils/mail').transporter;
 
     await transporter.sendMail({
@@ -662,4 +661,60 @@ exports.recibirContacto = async (req, res) => {
     console.error('Error al enviar mensaje de contacto:', error);
     res.status(500).json({ error: 'No se pudo enviar el mensaje', detalle: error.toString() });
   }
+};
+
+//Mapa temporal para códigos de recuperación
+global.passwordResetCodes = global.passwordResetCodes || {};
+
+//Enviar código por correo
+exports.enviarCodigoReset = async (req, res) => {
+  const { email } = req.body;
+  const [rows] = await pool.query('SELECT * FROM Usuario WHERE email = ?', [email]);
+  const user = rows[0];
+
+  if (!user) return res.status(404).json({ error: 'Correo no registrado' });
+
+  const codigo = Math.floor(100000 + Math.random() * 900000);
+  global.passwordResetCodes[email] = {
+    codigo,
+    //10 min de expiracion
+    expiresAt: Date.now() + 10 * 60 * 1000
+  };
+
+  const { sendPasswordResetEmail } = require('../utils/mail');
+  await sendPasswordResetEmail(email, codigo);
+
+  res.json({ message: 'Código enviado' });
+};
+
+//Verificar código
+exports.verificarCodigoReset = (req, res) => {
+  const { email, codigo } = req.body;
+  const registro = global.passwordResetCodes[email];
+
+  if (!registro) return res.status(400).json({ error: 'No se solicitó recuperación para este correo' });
+  if (Date.now() > registro.expiresAt) return res.status(400).json({ error: 'El código ha expirado' });
+  if (parseInt(codigo) !== registro.codigo) return res.status(400).json({ error: 'Código incorrecto' });
+
+  res.json({ message: 'Código válido' });
+};
+
+//Cambiar contraseña
+exports.restablecerPassword = async (req, res) => {
+  const { email, nuevoPassword } = req.body;
+  const registro = global.passwordResetCodes[email];
+
+  if (!registro) return res.status(400).json({ error: 'No autorizado para cambiar contraseña' });
+
+  const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+  if (!passwordRegex.test(nuevoPassword)) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres, una mayúscula y un número' });
+  }
+
+  const hashed = await bcrypt.hash(nuevoPassword, 10);
+  await pool.query('UPDATE Usuario SET password = ? WHERE email = ?', [hashed, email]);
+  delete global.passwordResetCodes[email];
+
+  res.json({ message: 'Contraseña restablecida correctamente' });
 };

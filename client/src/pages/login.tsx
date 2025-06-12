@@ -70,11 +70,12 @@ export default function Login() {
                     <input type="password" name="password" value={form.password} onChange={handleChange} required />
 
                     <button type="submit">LOGIN</button>
+                    <p>
+                        <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>
+                    </p>
                 </form>
                 <p>¿No tiene una cuenta? <Link to="/register">Cree una</Link></p>
             </div>
         </div>
-
-
     );
 }
