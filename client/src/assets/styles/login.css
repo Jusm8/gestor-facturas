@@ -1,78 +1,78 @@
 /* Centra todo el contenido en pantalla */
 .login-container {
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    background: linear-gradient(to right, #4760c0, #17224d);
-    box-sizing: border-box;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background: linear-gradient(to right, #4760c0, #17224d);
+  box-sizing: border-box;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html,
 body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    padding: 0;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* El cuadro del formulario */
 .login-card {
-    background: #17e6f7;
-    padding: 2rem;
-    border-radius: 20px;
-    width: 350px;
-    margin-right: 5vw;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    color: #000;
+  background: #17e6f7;
+  padding: 1rem;
+  border-radius: 20px;
+  width: 350px;
+  margin-right: 5vw;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: #000;
 }
 
 .login-card h2 {
-    text-align: center;
-    margin-bottom: 1rem;
+  text-align: center;
+  margin-bottom: 0.6px;
 }
 
 .login-card form {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .login-card label {
-    margin-top: 0.5rem;
-    font-weight: bold;
+  margin-top: 0.5rem;
+  font-weight: bold;
 }
 
 .login-card input {
-    padding: 0.5rem;
-    border-radius: 20px;
-    border: 1px solid black;
-    margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 20px;
+  border: 1px solid black;
+  margin-bottom: 0.5rem;
 }
 
 .login-card button {
-    margin-top: 1rem;
-    padding: 0.7rem;
-    border: none;
-    border-radius: 20px;
-    background-color: #ffffff;
-    font-weight: bold;
-    cursor: pointer;
-    color:#000
+  margin-top: 1rem;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 20px;
+  background-color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000
 }
 
 .login-card p {
-    margin-top: 1rem;
-    text-align: center;
+  margin-top: 9px;
+  text-align: center;
 }
 
 .login-info-panel {
@@ -110,4 +110,12 @@ body {
 
 .login-info-panel ul li {
   margin: 0.3rem 0;
+}
+
+.login-info-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }

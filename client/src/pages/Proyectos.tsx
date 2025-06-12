@@ -62,7 +62,7 @@ export default function Proyectos() {
         try {
           const token = localStorage.getItem('token');
           const user = JSON.parse(localStorage.getItem('user') || '{}');
-          const res = await fetch(`http://localhost:3001/api/auth/proyectos/usuario/${user.id}`, {
+          const res = await fetch(`http://localhost:3001/api/auth/proyectos/${idProyecto}`, {
             method: 'DELETE',
             headers: {
               Authorization: `Bearer ${token}`,

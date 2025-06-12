@@ -8,6 +8,20 @@ export default function Navbar() {
 
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+  const [clima, setClima] = React.useState('');
+  //Api del clima
+  const getWeatherEmoji = (code: number) => {
+    if ([0].includes(code)) return '☀️';
+    if ([1, 2].includes(code)) return '🌤️';
+    if ([3].includes(code)) return '☁️';
+    if ([45, 48].includes(code)) return '🌫️';
+    if ([51, 53, 55, 56, 57].includes(code)) return '🌦️';
+    if ([61, 63, 65, 66, 67].includes(code)) return '🌧️';
+    if ([71, 73, 75, 77, 85, 86].includes(code)) return '❄️';
+    if ([80, 81, 82].includes(code)) return '🌧️';
+    if ([95, 96, 99].includes(code)) return '⛈️';
+    return '🌡️';
+  };
 
   //logout
   const handleLogout = () => {
@@ -27,6 +41,34 @@ export default function Navbar() {
     });
   };
 
+  React.useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+
+          const weatherRes = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=auto`
+          );
+          const weatherData = await weatherRes.json();
+
+          if (weatherData?.current_weather) {
+            const temp = weatherData.current_weather.temperature;
+            const icon = getWeatherEmoji(weatherData.current_weather.weathercode);
+            setClima(`${icon} ${temp}°C`);
+          } else {
+            setClima('Clima no disponible');
+          }
+        } catch {
+          setClima('Clima no disponible');
+        }
+      },
+      () => {
+        setClima('Clima no disponible');
+      }
+    );
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
@@ -37,6 +79,7 @@ export default function Navbar() {
         )}
         <span onClick={() => navigate('/contactanos')}>Contáctanos</span>
         <span onClick={() => navigate('/sobre-nosotros')}>Sobre Nosotros</span>
+        <span className="clima-info">{clima}</span>
       </div>
       <div className="navbar-right">
         <span className="usuario" onClick={() => navigate('/perfil')}>

@@ -78,6 +78,18 @@ export default function Register() {
 
   return (
     <div className="login-container">
+      <div className="login-info-panel">
+        <div className="login-info-content">
+          <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
+          <h2>¡Únete a SimpliFac!</h2>
+          <p>Administra clientes, productos, facturas y presupuestos fácilmente.</p>
+          <ul>
+            <li>Registro rápido y seguro.</li>
+            <li>Verificación por email incluida.</li>
+            <li>Todo en una sola plataforma accesible.</li>
+          </ul>
+        </div>
+      </div>
       <div className="login-card">
         {step === 'form' ? (
           <>

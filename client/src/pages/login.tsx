@@ -50,14 +50,16 @@ export default function Login() {
     return (
         <div className="login-container">
             <div className="login-info-panel">
-                <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
-                <h2>Bienvenido a SimpliFac</h2>
-                <p>Gestiona tus facturas y presupuestos de forma sencilla y eficiente.</p>
-                <ul>
-                    <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos.</li>
-                    <li>Añade a sus clientes y sus productos para crear de forma rapida y clara su propia factura.</li>
-                    <li>Previsualize su factura y presupuestos para ver como quedara antes de descargarlo.</li>
-                </ul>
+                <div className="login-info-content">
+                    <img src="/SimplifacLogo.png" alt="Logo" className="login-logo" />
+                    <h2>Bienvenido a SimpliFac</h2>
+                    <p>Gestiona tus facturas y presupuestos de forma sencilla y eficiente.</p>
+                    <ul>
+                        <li>Controle su negocio, creando facturas y presupuestos en un abrir y cerrar de ojos.</li>
+                        <li>Añade a sus clientes y sus productos para crear de forma rápida y clara su propia factura.</li>
+                        <li>Previsualiza su factura y presupuestos antes de descargar.</li>
+                    </ul>
+                </div>
             </div>
 
             <div className="login-card">
